@@ -290,7 +290,7 @@ BEQ A2, R0, @wordcopy_return
 	ADDIU A0, A0, 0x4
 	BNE A2, R0, @wordcopy_loop
 	ADDIU A1, A1, 0x4
-@wordcopy_return
+@wordcopy_return:
 JR RA
 NOP
 
