@@ -1,0 +1,18 @@
+# Blender v2.79 (sub 0) OBJ File: 'lava--chase-2.blend'
+# www.blender.org
+mtllib lava--chase-2.mtl
+o Plane
+v 12.000000 6.000000 3.000000
+v 12.000000 6.000000 -3.000000
+v 18.000000 6.000000 3.000000
+v 18.000000 6.000000 -3.000000
+vt -3.000000 3.000000
+vt -6.000000 0.000000
+vt -3.000000 -0.000000
+vt -6.000000 3.000000
+vn 0.0000 1.0000 0.0000
+g Plane_Plane_Surface_Lava
+usemtl Surface_Lava
+s off
+f 1/1/1 4/2/1 2/3/1
+f 1/1/1 3/4/1 4/2/1

@@ -1,0 +1,84 @@
+.align 4
+
+lava_chase_geo_layout_1:
+.word 0x20007FFF
+.word 0x04000000
+	.word 0x15010000, @fast3d_1
+.word 0x05000000
+.word 0x01000000
+
+lava_chase_geo_layout_2:
+.word 0x200004B0
+.word 0x04000000
+	.word 0x15010000, @fast3d_2
+.word 0x05000000
+.word 0x01000000
+
+@fast3d_1:
+.word 0xE7000000, 0x00000000
+.word 0xB7000000, 0x00000000
+.word 0xFC121824, 0xFF33FFFF
+.word 0xBB000001, 0xFFFFFFFF
+.word 0xE8000000, 0x00000000
+.word 0xE6000000, 0x00000000
+.word 0x03860010, @light_values
+.word 0x03880010, @light_values
+.word 0xFD100000, lava_texture
+.word 0xF5100000, 0x07000000
+.word 0xE6000000, 0x00000000
+.word 0xF3000000, 0x073FF100
+.word 0xE7000000, 0x00000000
+.word 0xF5101000, 0x00014050
+.word 0xF2000000, 0x0007C07C
+.word 0x04E000F0, @vertices_1
+.word 0xBF000000, 0x00000A14
+.word 0xBF000000, 0x001E2832
+.word 0xBF000000, 0x003C4650
+.word 0xBF000000, 0x005A646E
+.word 0xBF000000, 0x0078828C
+.word 0xE7000000, 0x00000000
+.word 0xFC127FFF, 0xFFFFF838
+.word 0xBB000000, 0xFFFFFFFF
+.word 0xB8000000, 0x00000000
+
+@fast3d_2:
+.word 0xE7000000, 0x00000000
+.word 0xB7000000, 0x00000000
+.word 0xFC121824, 0xFF33FFFF
+.word 0xBB000001, 0xFFFFFFFF
+.word 0xE8000000, 0x00000000
+.word 0xE6000000, 0x00000000
+.word 0x03860010, @light_values
+.word 0x03880010, @light_values
+.word 0xFD100000, lava_texture
+.word 0xF5100000, 0x07000000
+.word 0xE6000000, 0x00000000
+.word 0xF3000000, 0x073FF100
+.word 0xE7000000, 0x00000000
+.word 0xF5101000, 0x00014050
+.word 0xF2000000, 0x0007C07C
+.word 0x04E000F0, @vertices_2
+.word 0xBF000000, 0x00000A14
+.word 0xBF000000, 0x001E2832
+.word 0xBF000000, 0x003C4650
+.word 0xBF000000, 0x005A646E
+.word 0xBF000000, 0x0078828C
+.word 0xE7000000, 0x00000000
+.word 0xFC127FFF, 0xFFFFF838
+.word 0xBB000000, 0xFFFFFFFF
+.word 0xB8000000, 0x00000000
+
+lava_chase_collision_1:
+.incbin "./collision-1.bin"
+.align 4
+lava_chase_collision_2:
+.incbin "./collision-2.bin"
+.align 4
+
+@light_values:
+.word 0xFFFFFFFF, 0xFFFFFFFF
+
+@vertices_1:
+.incbin "./vertices-1.bin"
+@vertices_2:
+.incbin "./vertices-2.bin"

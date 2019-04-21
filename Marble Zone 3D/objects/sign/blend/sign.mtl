@@ -1,0 +1,26 @@
+# Blender MTL File: 'sign.blend'
+# Material Count: 2
+
+newmtl Sign_Face
+collisionType 0 0 0
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd sign-mario.png
+
+newmtl Sign_Side
+collisionType 0 0 0
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd sign-side.png
