@@ -150,21 +150,6 @@ MTC1 R0, F1
 JR RA
 ADDIU SP, SP, 0x20
 
-/* set_object_model FIXME: broken?
-Sets the model of the given object using the modelId
-args:
-	A0 - [pointer] object
-	A1 - [short] modelId
-*/
-set_object_model:
-LI T0, 0x8032DDC4
-SLL AT, A1, 0x2
-ADDU T0, T0, AT
-LW AT, 0x0 (T0)
-JR RA
-SW AT, 0x14 (A0)
-
-
 /* debug_print
 Prints a word of memory, formatted in hex, to the top-left of the screen
 args:
@@ -246,8 +231,8 @@ SB AT, 0x0 (A1)
 
 /* begin_print_encoded_text
 Sets up the graphics context to display regular text. Call this before calling
-print_encoded_text. Note that this modified the graphics context, so it is not
-safe to call this just anywhere like you can with print_int/debug_print. A good
+print_encoded_text. Note that this modifies the graphics context, so it is not
+safe to call this just anywhere like you can with print/debug_print. A good
 place to use this function is just after the HUD renders or when the pause
 screen is being rendered.
 args:
@@ -323,3 +308,4 @@ NOP
 .byte 0x54, 0xFE, 0x55, 0x50, 0x9F, 0xF5
 .byte 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D
 .byte 0x57, 0x56, 0x58, 0xF7, 0x9E
+.align 4
