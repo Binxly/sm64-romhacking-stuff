@@ -32,6 +32,7 @@ BNE AT, R0, @is_spike_platform
 	SW V0, o_collision_pointer (S0)
 	
 @finish_init:
+SW R0, o_intangibility_timer (S0)
 LW S0, 0x10 (SP)
 LW RA, 0x14 (SP)
 JR RA
@@ -43,6 +44,27 @@ SW RA, 0x14 (SP)
 SW S0, 0x10 (SP)
 
 LW S0, g_current_obj_ptr
+
+; Fix bug where there is a small chance of the rising platform eating your
+; longjump height, but making it intangible for a few frames after longjumping
+LI T0, g_mario
+LW T1, m_action (T0)
+LW AT, 0xFC (S0)
+BEQ T1, AT, @end_longjump_fix
+SW T1, 0xFC (S0)
+
+LI AT, 0x03000888
+BNE T1, AT, @end_longjump_fix
+
+LW AT, m_floor_ptr (T0)
+BEQ AT, R0, @end_longjump_fix
+NOP
+LW AT, t_object (AT)
+BNE AT, S0, @end_longjump_fix
+ORI AT, R0, 0x5
+SW AT, o_intangibility_timer (S0)
+
+@end_longjump_fix:
 LW T0, o_timer (S0)
 
 ORI AT, R0, 0x1
@@ -144,7 +166,14 @@ JAL take_damage_and_knockback
 SLL A1, S0, 0x0
 
 @return:
+LW AT, o_intangibility_timer (S0)
+BNE AT, R0, @actually_return
+NOP
+JAL process_collision
+NOP
+
+@actually_return:
 LW S0, 0x10 (SP)
 LW RA, 0x14 (SP)
-J process_collision
+JR RA
 ADDIU SP, SP, 0x18
