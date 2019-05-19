@@ -3,6 +3,7 @@ Falcobuster's Labels and Helper Functions v2.0.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
+https://gitlab.com/mpharoah/sm64-romhacking-stuff
 */
 
 ; NOTE: some types defining rotation are listed as "int (sign extended short)"
