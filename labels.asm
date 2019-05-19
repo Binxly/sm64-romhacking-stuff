@@ -1,3 +1,10 @@
+/* labels.asm + helper-functions.asm
+Falcobuster's Labels and Helper Functions v2.0.0
+These two files are public domain. You may use, modify, and distribute them
+however you wish without restriction. Preserving this header comment is
+appreciated, but not required.
+*/
+
 ; NOTE: some types defining rotation are listed as "int (sign extended short)"
 ; This means that the value is stored as a signed 32-bit integer, but in normal
 ; gameplay it's really just a signed 16-bit short that has been sign extended to
@@ -16,6 +23,7 @@ g_displayed_coins equ 0x8033B262	; short -- number of coins shown on the HUD (no
 g_level_num equ 0x8032DDF8			; short -- level number shown in Quad64
 g_course_num equ 0x8033BAC6			; short -- course number shown in game (save file uses this minus 1)
 g_camera_position equ 0x8033C6A4	; float[3] -- x, y, and z co-ordinates of the camera (read-only)
+g_camera_fov equ 0x8033C5A4			; float -- camera field of view
 g_save_file_num equ 0x8032DDF4		; short -- current save file number (starts at 1, game usually subtracts one from this before using it)
 g_display_list_head equ 0x8033B06C	; pointer
 
@@ -85,7 +93,7 @@ o_arg3 equ 0x18B				; byte -- B. Param 4
 o_parent equ 0x68				; pointer
 o_render_distance equ 0x19C		; float
 o_collision_distance equ 0x194	; float
-o_intangibility_timer equ 0x09C	; int -- make negative to be infinite
+o_intangibility_timer equ 0x9C	; int -- make negative to be infinite
 o_opacity equ 0x17C				; int (but only the lower byte actually matters)
 o_floor_height equ 0xE8			; float -- height of the floor beneath the object
 o_num_loot_coins equ 0x198		; integer
@@ -469,3 +477,31 @@ a1: [short] y position
 a2: [pointer] encoded text
 */
 print_encoded_text equ 0x802D77DC
+
+/* dma_read
+Load a chunk of data from the ROM into RAM
+a0: [pointer] memory addres to being writing to
+a1: [ROM address] ROM address to start reading from
+a2: [ROM address] ROM address to stop reading at
+*/
+dma_read equ 0x80278504
+
+/* malloc
+Tries to allocate memory on the main pool (not the same as malloc in C)
+a0: [uint] bytes of memory to allocate
+a1: [uint] side (0 = left side, 1 = right side)
+[out] v0: [pointer] pointer to allocated memory, or NULL if not enough space
+*/
+malloc equ 0x80278120
+
+/* free
+Frees memory that was allocated on the main pool.
+IMPORTANT: This must be the most recently allocated block from its side of the
+memory pool!
+a0: [pointer] pointer that was allocated using malloc
+[out] v0: [uint] free space remaining in the pool
+*/
+free equ 0x80278238
+
+
+;; TODO: 0x8029f514 sets animation and animation speed? (int, float)
