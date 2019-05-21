@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.0.0
+Falcobuster's Labels and Helper Functions v2.0.1
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -98,7 +98,7 @@ o_intangibility_timer equ 0x9C	; int -- make negative to be infinite
 o_opacity equ 0x17C				; int (but only the lower byte actually matters)
 o_floor_height equ 0xE8			; float -- height of the floor beneath the object
 o_num_loot_coins equ 0x198		; integer
-o_animation_frame equ 0xF0		; integer
+o_animation_frame equ 0x40		; short
 o_collision_pointer equ 0x218	; pointer
 
 ; collision triangle struct
