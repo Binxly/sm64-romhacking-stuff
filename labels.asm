@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.0.2
+Falcobuster's Labels and Helper Functions v2.1.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -35,6 +35,7 @@ m_peak_height equ 0xBC	; float -- Mario's highest y co-ordinate since he last to
 m_health equ 0xAE		; short -- upper byte is integer health, lower byte is 1/256th health units
 m_area equ 0x90			; pointer
 m_camera equ 0x94		; pointer
+m_controller equ 0x9C	; pointer -- see controller struct below
 m_coins equ 0xA8		; short
 m_stars equ 0xAA		; short
 m_lives equ 0xAC		; short
@@ -50,6 +51,31 @@ m_wall_ptr equ 0x60		; pointer
 m_floor_ptr equ 0x68	; pointer
 m_hurt_counter equ 0xB2	; unisgned byte -- if > 0, damage mario by 1/4 health next frame and decrement
 m_heal_counter equ 0xB3 ; unsigned byte -- same as above, but heals
+
+; Controller struct
+c_analog_short_x equ 0x0	; short -- analog stick horizontal position [-80,80]
+c_analog_short_y equ 0x2	; short -- analog stick vertical position [-80,80]
+c_analog_float_x equ 0x4	; float -- analog stick horizontal position [-64,64]
+c_analog_float_y equ 0x8	; float -- analog stick vertical position [-64,64]
+c_analog_float_mag equ 0xC	; float -- analog stick distance from centre [0,64]
+c_buttons_held equ 0x10		; unsigned short -- flags for buttons currently pressed (see constants below)
+c_buttons_pressed equ 0x12	; unsigned short -- flags for buttons pressed this frame (see constants below)
+
+; Controller Button Flag Constants
+C_BUTTON_C_RIGHT equ		0x0001
+C_BUTTON_C_LEFT equ			0x0002
+C_BUTTON_C_DOWN equ			0x0004
+C_BUTTON_C_UP equ			0x0008
+C_TRIGGER_R equ				0x0010
+C_TRIGGER_L equ				0x0020
+C_BUTTON_D_PAD_RIGHT equ	0x0100
+C_BUTTON_D_PAD_LEFT equ		0x0200
+C_BUTTON_D_PAD_DOWN equ		0x0400
+C_BUTTON_D_PAD_UP equ		0x0800
+C_BUTTON_START equ			0x1000
+C_TRIGGER_Z equ				0x2000
+C_BUTTON_B equ				0x4000
+C_BUTTON_A equ				0x8000
 
 ; Object struct
 o_move_angle_pitch equ 0xC4		; int (sign extended short) 
@@ -416,6 +442,11 @@ copy_object_pos equ 0x8029F120
 a0: [short] floor slope angle -- uses degrees instead of the usual angle format because reasons (make negative to prevent it from walking off edges. Might require additional flags for this to work correctly?)
 */
 obj_move_standard equ 0x802A2348
+
+/* simple_move
+Moves the current object using its x, y, and z speeds
+*/
+move_simple equ 0x8029F070
 
 /* set_music
 a0: [byte] music channel? (can be 0, 1, or 2. You can have up to 3 songs playing at the same time by putting them on different channels)
