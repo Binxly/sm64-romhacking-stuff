@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.0.1
+Falcobuster's Labels and Helper Functions v2.0.2
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -334,7 +334,7 @@ is_animation_playing equ 0x8029FF04
 get_random_short equ 0x80383BB0
 
 /* get_random_float
-[out] v0: [float] a random float in the range [0,1)
+[out] f0: [float] a random float in the range [0,1)
 */
 get_random_float equ 0x80383CB4
 
