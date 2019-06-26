@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.1.0
+Falcobuster's Labels and Helper Functions v2.3.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -52,6 +52,61 @@ ADDU A0, AT, A0
 L.S F0, 0x6000 (A0)
 JR RA
 L.S F1, 0x7000 (A0)
+
+/* cross_product
+Computes the cross product of two vectors
+args:
+	A0 - [pointer] pointer to vector A
+	A1 - [pointer] pointer to vector B
+	A2 - [pointer] pointer to output vector
+*/
+cross_product:
+L.S F4, 0x4 (A0)
+L.S F5, 0x8 (A1)
+MUL.S F4, F4, F5
+L.S F5, 0x8 (A0)
+L.S F6, 0x4 (A1)
+MUL.S F5, F5, F6
+SUB.S F4, F4, F5
+S.S F4, 0x0 (A2)
+
+L.S F4, 0x8 (A0)
+L.S F5, 0x0 (A1)
+MUL.S F4, F4, F5
+L.S F5, 0x0 (A0)
+L.S F6, 0x8 (A1)
+MUL.S F5, F5, F6
+SUB.S F4, F4, F5
+S.S F4, 0x4 (A2)
+
+L.S F4, 0x0 (A0)
+L.S F5, 0x4 (A1)
+MUL.S F4, F4, F5
+L.S F5, 0x4 (A0)
+L.S F6, 0x0 (A1)
+MUL.S F5, F5, F6
+SUB.S F4, F4, F5
+S.S F4, 0x8 (A2)
+
+JR RA
+NOP
+
+/* get_floor_steepness
+Gets the steepness angle of the floor triangle
+args:
+	A0 - [pointer] floor triangle
+returns:
+	V0 - [short] angle of steepness
+*/
+get_floor_steepness:
+L.S F4, t_normal_x (A0)
+L.S F5, t_normal_z (A0)
+MUL.S F4, F4, F4
+MUL.S F5, F5, F5
+ADD.S F4, F4, F5
+SQRT.S F14, F4
+J atan2s
+L.S F12, t_normal_y (A0)
 
 /* angle_from_object_to_point
 Returns the angle (as a short) from the given object's
@@ -157,6 +212,41 @@ MTC1 R0, F0
 MTC1 R0, F1
 JR RA
 ADDIU SP, SP, 0x20
+
+/* colliding_with_type
+Checks if the given object is currently colliding with an object that has the
+given behaviour.
+args:
+	A0 - [pointer] object to check
+	A1 - [segmented pointer] behaviour
+return:
+	V0 - [pointer] the first colliding object with the given behaviour, or NULL
+*/
+colliding_with_type:
+ADDIU SP, SP, 0xFFE8
+SW RA, 0x14 (SP)
+SW A0, 0x10 (SP)
+
+JAL segmented_to_virtual
+SLL A0, A1, 0x0
+SLL A1, V0, 0x0
+
+LW A0, 0x10 (SP)
+LHU T0, o_num_collided_objects (A0)
+BEQ T0, R0, @@return_null
+@@loop:
+	LW V0, o_collided_objects (A0)
+	LW AT, 0x20C (V0)
+	BEQ AT, A1, @@return_ptr
+	ADDIU T0, T0, 0xFFFF
+	BNE T0, R0, @@loop
+	ADDIU A0, A0, 0x4
+@@return_null:
+SLL V0, R0, 0x0
+@@return_ptr:
+LW RA, 0x14 (SP)
+JR RA
+ADDIU SP, SP, 0x18
 
 /* debug_print
 Prints a word of memory, formatted in hex, to the top-left of the screen
@@ -276,10 +366,6 @@ ADDIU T0, T0, 0x8
 SW.U T0, g_display_list_head
 JR RA
 SW.L T0, g_display_list_head
-
-LW RA, 0x14 (SP)
-JR RA
-ADDIU SP, SP, 0x18
 
 /* wordcopy
 Copies a number of words from one location in RAM to another. More efficient

@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.1.0
+Falcobuster's Labels and Helper Functions v2.3.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -46,9 +46,13 @@ m_speed_x equ 0x48		; float
 m_speed_y equ 0x4C		; float
 m_speed_z equ 0x50		; float
 m_speed_h equ 0x54		; float
+m_angle_pitch equ 0x2C	; short
+m_angle_yaw equ 0x2E	; short
+m_angle_roll equ 0x30	; short
 m_ceiling_ptr equ 0x64	; pointer
 m_wall_ptr equ 0x60		; pointer
 m_floor_ptr equ 0x68	; pointer
+m_floor_height equ 0x70	; float
 m_hurt_counter equ 0xB2	; unisgned byte -- if > 0, damage mario by 1/4 health next frame and decrement
 m_heal_counter equ 0xB3 ; unsigned byte -- same as above, but heals
 
@@ -122,7 +126,8 @@ o_render_distance equ 0x19C		; float
 o_collision_distance equ 0x194	; float
 o_intangibility_timer equ 0x9C	; int -- make negative to be infinite
 o_opacity equ 0x17C				; int (but only the lower byte actually matters)
-o_floor_height equ 0xE8			; float -- height of the floor beneath the object
+o_floor_ptr equ 0x1C0			; pointer -- pointer to floor triangle beneat the object (doesn't work for Mario object)
+o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doesn't work for Mario object)
 o_num_loot_coins equ 0x198		; integer
 o_animation_frame equ 0x40		; short
 o_collision_pointer equ 0x218	; pointer
@@ -213,6 +218,7 @@ get_dist_2d equ 0x8029E27C
 
 /* sqrt
 Computes the square root of a number
+NOTE: You can simply use the MIPS instruction SQRT.S instead
 f12: number to square root
 [out] f0: result
 */
@@ -346,8 +352,32 @@ print equ 0x802D62D8
 Moves the current object's o_move_angle_yaw towards a target value
 a0: [short] target angle
 a1: [short] maximum angle to change o_move_angle_yaw by
+[out] v0: [bool] non-zero if the object is already facing the target direction
 */
 turn_move_angle_towards_target_angle equ 0x8029E5EC
+
+/* turn_angle
+Moves an angle towards a target angle
+a0: [short] starting angle
+a1: [short] target angle
+a2: [short] maximum angle change
+[out] v0: [short] resulting angle
+*/
+turn_angle equ 0x8029E530
+
+/* abs_angle_diff
+Gets the absolute difference between two angles
+a0: [short] angle 1
+a1: [short] angle 2
+[out] v0: [short] difference
+*/
+abs_angle_diff 0x802A11A8
+
+/* get_angle_to_home
+Gets the angle to the current object's home position
+[out] v0: [short] angle to home
+*/
+get_angle_to_home equ 0x802A2748
 
 /* is_animation_playing
 [out] v0: [bool] non-zero if the current object is playing an animation
