@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.3.0
+Falcobuster's Labels and Helper Functions v2.4.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -131,6 +131,7 @@ o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doe
 o_num_loot_coins equ 0x198		; integer
 o_animation_frame equ 0x40		; short
 o_collision_pointer equ 0x218	; pointer
+o_matrix_transform equ 0x21C	; float[4][4]
 
 ; collision triangle struct
 t_collision_type equ 0x0		; unsigned short
@@ -371,7 +372,7 @@ a0: [short] angle 1
 a1: [short] angle 2
 [out] v0: [short] difference
 */
-abs_angle_diff 0x802A11A8
+abs_angle_diff equ 0x802A11A8
 
 /* get_angle_to_home
 Gets the angle to the current object's home position
@@ -564,6 +565,14 @@ a0: [pointer] pointer that was allocated using malloc
 [out] v0: [uint] free space remaining in the pool
 */
 free equ 0x80278238
+
+/* matrix_transform
+Applies an affine transformation defined by a 4x4 matrix to a 3D vector.
+The vector is modified in-place
+a0: [pointer] pointer to the 4x4 matrix
+[ref] a1: [pointer] pointer to the 3D vector to transform
+*/
+matrix_transform equ 0x8037A348
 
 
 ;; TODO: 0x8029f514 sets animation and animation speed? (int, float)
