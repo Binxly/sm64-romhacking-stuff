@@ -131,7 +131,6 @@ o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doe
 o_num_loot_coins equ 0x198		; integer
 o_animation_frame equ 0x40		; short
 o_collision_pointer equ 0x218	; pointer
-o_matrix_transform equ 0x21C	; float[4][4]
 
 ; collision triangle struct
 t_collision_type equ 0x0		; unsigned short
@@ -567,10 +566,10 @@ a0: [pointer] pointer that was allocated using malloc
 free equ 0x80278238
 
 /* matrix_transform
-Applies an affine transformation defined by a 4x4 matrix to a 3D vector.
+Applies an affine transformation defined by a 4x4 matrix to a 3D vector of shorts.
 The vector is modified in-place
-a0: [pointer] pointer to the 4x4 matrix
-[ref] a1: [pointer] pointer to the 3D vector to transform
+a0: [pointer] pointer to the 4x4 matrix of floats
+[ref] a1: [pointer] pointer to the 3D vector of shorts to transform
 */
 matrix_transform equ 0x8037A348
 
