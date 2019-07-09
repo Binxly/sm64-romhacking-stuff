@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.4.0
+Falcobuster's Labels and Helper Functions v3.0.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -18,18 +18,21 @@ https://gitlab.com/mpharoah/sm64-romhacking-stuff
 g_mario equ 0x8033B170				; struct
 g_current_obj_ptr equ 0x80361160	; pointer
 g_mario_obj_ptr equ 0x80361158		; pointer
-g_camera equ 0x8033C520				; struct
+g_camera_state equ 0x8033C698		; struct -- see camera state struct below
 g_is_invulnerable equ 0x8033B272	; short (boolean) -- is Mario currently invulnerable
 g_displayed_coins equ 0x8033B262	; short -- number of coins shown on the HUD (not the same as actual coins)
 g_level_num equ 0x8032DDF8			; short -- level number shown in Quad64
 g_course_num equ 0x8033BAC6			; short -- course number shown in game (save file uses this minus 1)
 g_camera_position equ 0x8033C6A4	; float[3] -- x, y, and z co-ordinates of the camera (read-only)
-g_camera_fov equ 0x8033C5A4			; float -- camera field of view
+g_camera_fov equ 0x8033C5A4			; float -- camera vertical field of view (in degrees)
 g_save_file_num equ 0x8032DDF4		; short -- current save file number (starts at 1, game usually subtracts one from this before using it)
 g_display_list_head equ 0x8033B06C	; pointer
+g_global_timer equ 0x8032D5D4		; unsigned int
 
 ; Mario struct
 m_action equ 0xC		; unsigned int
+m_action_timer equ 0x1A	; unsigned short
+m_action_arg equ 0x1C	; unsigned int
 m_hitstun equ 0x26		; short -- invulnerability frames
 m_peak_height equ 0xBC	; float -- Mario's highest y co-ordinate since he last touched the ground. Used for fall damage
 m_health equ 0xAE		; short -- upper byte is integer health, lower byte is 1/256th health units
@@ -53,6 +56,7 @@ m_ceiling_ptr equ 0x64	; pointer
 m_wall_ptr equ 0x60		; pointer
 m_floor_ptr equ 0x68	; pointer
 m_floor_height equ 0x70	; float
+m_ceiling_height equ 0x6C	; float
 m_hurt_counter equ 0xB2	; unisgned byte -- if > 0, damage mario by 1/4 health next frame and decrement
 m_heal_counter equ 0xB3 ; unsigned byte -- same as above, but heals
 
@@ -105,7 +109,7 @@ o_home_z equ 0x16C				; float
 o_gravity equ 0xE4				; float -- normal gravity is negative (-4 for Mario)
 o_bounce equ 0x158				; float
 o_buoyancy equ 0x174			; float
-o_speed_h equ 0xB8				; float -- horizontal speed. Use the decompose_speed function to set o_speed_x and o_speed_y
+o_speed_h equ 0xB8				; float -- horizontal speed. Use the decompose_speed function to set o_speed_x and o_speed_z
 o_speed_x equ 0xAC				; float
 o_speed_y equ 0xB0				; float
 o_speed_z equ 0xB4				; float
@@ -135,11 +139,20 @@ o_collision_pointer equ 0x218	; pointer
 ; collision triangle struct
 t_collision_type equ 0x0		; unsigned short
 t_object equ 0x2C				; pointer -- pointer to the object this collision triangle belongs to, or NULL (0) if it's level geometry
-t_min_y equ 0x6					; float
-t_max_y equ 0x8					; float
+t_min_y equ 0x6					; short
+t_max_y equ 0x8					; short
 t_normal_x equ 0x1C				; float
 t_normal_y equ 0x20				; float
 t_normal_z equ 0x24				; float
+
+; camera state struct (read-only)
+; These values get copied into the struct from other places.
+; Changing these values won't affect the camera, but will mess up analog controls
+cam_x equ 0x8C		; float
+cam_y equ 0x90		; float
+cam_z equ 0x94		; float
+cam_pitch equ 0x4C	; short
+cam_yaw equ 0x4E	; short
 
 /* Functions */
 
@@ -372,12 +385,6 @@ a1: [short] angle 2
 [out] v0: [short] difference
 */
 abs_angle_diff equ 0x802A11A8
-
-/* get_angle_to_home
-Gets the angle to the current object's home position
-[out] v0: [short] angle to home
-*/
-get_angle_to_home equ 0x802A2748
 
 /* is_animation_playing
 [out] v0: [bool] non-zero if the current object is playing an animation

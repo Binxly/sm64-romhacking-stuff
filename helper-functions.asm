@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v2.4.0
+Falcobuster's Labels and Helper Functions v3.0.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -7,9 +7,9 @@ https://gitlab.com/mpharoah/sm64-romhacking-stuff
 */
 
 /* sin_u16
-Take the sine of an angle stored as an unsigned short
+Take the sine of an angle stored as a short
 args:
-	A0 - [ushort] the angle
+	A0 - [short] the angle
 returns:
 	F0 - [float] the sine of the angle
 */
@@ -22,9 +22,9 @@ JR RA
 L.S F0, 0x6000 (A0)
 
 /* cos_u16
-Take the cosine of an angle stored as an unsigned short
+Take the cosine of an angle stored as a short
 args:
-	A0 - [ushort] the angle
+	A0 - [short] the angle
 returns:
 	F0 - [float] the sine of the angle
 */
@@ -35,6 +35,44 @@ LUI AT, 0x8038
 ADDU A0, AT, A0
 JR RA
 L.S F0, 0x7000 (A0)
+
+/* tan_u16
+Take the tangent of an angle stored as a short
+args:
+	A0 - [short] the angle
+returns:
+	F0 - [float] the tangent of the angle
+*/
+tan_u16:
+ADDIU SP, SP, 0xFFE8
+SW RA, 0x14 (SP)
+ANDI A0, A0, 0xFFFF
+ORI AT, R0, 0x8000
+SLTU T0, A0, AT
+JAL cos_u16
+SW T0, 0x10 (SP)
+MTC1 R0, F4
+LUI AT, 0x3F80
+C.EQ.S F4, F0
+MTC1 AT, F5
+BC1T @@return_nan
+MUL.S F4, F0, F0
+SUB.S F4, F5, F4
+SQRT.S F4, F4
+DIV.S F0, F4, F0
+LW T0, 0x10 (SP)
+BNE T0, R0, @@return
+NOP
+NEG.S F0, F0
+@@return:
+LW RA, 0x14 (SP)
+JR RA
+ADDIU SP, SP, 0x18
+@@return_nan:
+LUI AT, 0x7F80
+ORI AT, AT, 0x1
+B @@return
+MTC1 AT, F0
 
 /* angle_to_unit_vector
 Converts a 16-bit angle into a unit vector
@@ -415,6 +453,149 @@ MUL.S F1, F1, F4
 LW RA, 0x14 (SP)
 JR RA
 ADDIU SP, SP, 0x18
+
+/* perspective_transform
+Returns the screen co-ordinates of the given point in world co-ordinates as
+determined by the camera's current position, orientation, and field of view.
+Co-ordinates are returned as floating point numbers, and must be converted to
+integers before being used in fast3D commands.
+args:
+	F12 - x component of the point to transform
+	F13 - y component of the point to transform
+	F14 - z component of the point to transform
+returns:
+	V0 - non-zero if the point is within 90 degrees of the camera
+	F0 - x component of the transformed point (undefined if v0 is 0)
+	F1 - y component of the transformed point (undefined if v0 is 0)
+*/
+perspective_transform:
+ADDIU SP, SP, 0xFFE0
+SW RA, 0x1C (SP)
+
+@@HALF_SCREEN_WIDTH equ float( 0x280 )
+@@HALF_SCREEN_HEIGHT equ float( 0x1E0 )
+
+LI T0, g_camera_state
+L.S F4, cam_x (T0)
+L.S F5, cam_y (T0)
+L.S F6, cam_z (T0)
+
+SUB.S F4, F12, F4
+SUB.S F5, F13, F5
+SUB.S F6, F14, F6
+
+MOV.S F14, F4
+MOV.S F12, F6
+
+S.S F5, 0x10 (SP)
+MUL.S F4, F12, F12
+MUL.S F5, F14, F14
+ADD.S F4, F4, F5
+SQRT.S F4, F4
+
+JAL atan2s
+S.S F4, 0x14 (SP)
+SW V0, 0x18 (SP)
+
+LI AT, 0x42B60B61
+MTC1 AT, F5
+L.S F4, g_camera_fov
+MUL.S F4, F4, F5
+CVT.W.S F4, F4
+
+MFC1 A0, F4
+JAL tan_u16
+NOP
+LI AT, @@HALF_SCREEN_HEIGHT
+MTC1 AT, F4
+LH V0, 0x1A (SP)
+DIV.S F4, F4, F0
+S.S F4, 0x18 (SP)
+
+LI T0, g_camera_state
+LH T1, cam_yaw (T0)
+SUBU T1, T1, V0
+
+SLL T1, T1, 0x10
+SRA A0, T1, 0x10
+
+ABS T1, A0
+SLTI AT, T1, 0x4000
+BEQ AT, R0, @@behind_camera
+NOP
+
+JAL tan_u16
+NOP
+
+L.S F4, 0x18 (SP)
+LI AT, @@HALF_SCREEN_WIDTH
+MTC1 AT, F5
+MUL.S F4, F4, F0
+ADD.S F4, F4, F5
+
+L.S F12, 0x14 (SP)
+S.S F4, 0x14 (SP)
+JAL atan2s
+L.S F14, 0x10 (SP)
+
+LI T0, g_camera_state
+LH T1, cam_pitch (T0)
+SUBU T1, T1, V0
+
+SLL T1, T1, 0x10
+SRA A0, T1, 0x10
+
+ABS T1, A0
+SLTI AT, T1, 0x4000
+BEQ AT, R0, @@behind_camera
+NOP
+
+JAL tan_u16
+NOP
+
+L.S F4, 0x18 (SP)
+LI AT, @@HALF_SCREEN_HEIGHT
+MTC1 AT, F5
+MUL.S F4, F4, F0
+ADD.S F1, F5, F4
+L.S F0, 0x14 (SP)
+ORI V0, R0, 0x1
+
+LW RA, 0x1C (SP)
+JR RA
+ADDIU SP, SP, 0x20
+@@behind_camera:
+ORI V0, R0, 0x0
+LW RA, 0x1C (SP)
+JR RA
+ADDIU SP, SP, 0x20
+
+/* create_draw_rect_command
+Generates a Fast3D command for drawing a rectangle
+args:
+	A0 - x co-ordinate of the left side of the rectangle
+	A1 - y co-ordinate of the top side of the rectangle
+	A2 - width of the rectangle
+	A3 - height of the rectangle
+returns:
+	V0 - the upper half of the Fast3D command
+	V1 - the lower half of the Fast3D command
+*/
+create_draw_rect_command:
+ADDU A2, A0, A2
+ADDU A3, A1, A3
+ANDI A0, A0, 0xFFF
+ANDI A1, A1, 0xFFF
+ANDI A2, A2, 0xFFF
+ANDI A3, A3, 0xFFF
+LUI V0, 0xF600
+SLL A2, A2, 0xC
+OR A2, A2, A3
+OR V0, V0, A2
+SLL A0, A0, 0xC
+JR RA
+OR V1, A0, A1
+
 
 @debug:
 .asciiz "%04x"
