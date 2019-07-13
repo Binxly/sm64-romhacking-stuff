@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.0.0
+Falcobuster's Labels and Helper Functions v3.1.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -91,12 +91,35 @@ L.S F0, 0x6000 (A0)
 JR RA
 L.S F1, 0x7000 (A0)
 
-/* cross_product
-Computes the cross product of two vectors
+/* dot_product_3d
+Computes the dot product of two 3 dimensional vectors.
 args:
 	A0 - [pointer] pointer to vector A
 	A1 - [pointer] pointer to vector B
-	A2 - [pointer] pointer to output vector
+returns:
+	F0 - dot product
+*/
+dot_product_3d:
+L.S F5, 0x0 (A0)
+L.S F6, 0x0 (A1)
+MUL.S F4, F5, F6
+L.S F5, 0x4 (A0)
+L.S F6, 0x4 (A1)
+MUL.S F5, F5, F6
+ADD.S F4, F4, F5
+L.S F5, 0x8 (A0)
+L.S F6, 0x8 (A1)
+MUL.S F5, F5, F6
+JR RA
+ADD.S F0, F4, F5
+
+/* cross_product
+Computes the cross product of two vectors. Result is both stored in the return
+registers F0 - F2 and writen to memory at A2
+args:
+	A0 - [pointer] pointer to vector A
+	A1 - [pointer] pointer to vector B
+	A2 - [pointer] pointer to output vector (or NULL to not store the result)
 */
 cross_product:
 L.S F4, 0x4 (A0)
@@ -105,8 +128,7 @@ MUL.S F4, F4, F5
 L.S F5, 0x8 (A0)
 L.S F6, 0x4 (A1)
 MUL.S F5, F5, F6
-SUB.S F4, F4, F5
-S.S F4, 0x0 (A2)
+SUB.S F0, F4, F5
 
 L.S F4, 0x8 (A0)
 L.S F5, 0x0 (A1)
@@ -114,8 +136,7 @@ MUL.S F4, F4, F5
 L.S F5, 0x0 (A0)
 L.S F6, 0x8 (A1)
 MUL.S F5, F5, F6
-SUB.S F4, F4, F5
-S.S F4, 0x4 (A2)
+SUB.S F1, F4, F5
 
 L.S F4, 0x0 (A0)
 L.S F5, 0x4 (A1)
@@ -123,9 +144,14 @@ MUL.S F4, F4, F5
 L.S F5, 0x4 (A0)
 L.S F6, 0x0 (A1)
 MUL.S F5, F5, F6
-SUB.S F4, F4, F5
-S.S F4, 0x8 (A2)
+BEQ A2, R0, @@return
+SUB.S F2, F4, F5
 
+S.S F0, 0x0 (A2)
+S.S F1, 0x4 (A2)
+S.S F2, 0x8 (A2)
+
+@@return:
 JR RA
 NOP
 
@@ -303,12 +329,12 @@ SUBU A1, AT, A1
 SW A1, 0x10 (SP)
 
 ANDI A3, A0, 0xFFFF
-LI A2, @debug
+LI A2, @debug_text
 JAL print
 ORI A0, R0, 0x40
 
 LHU A3, 0x18 (SP)
-LI A2, @debug
+LI A2, @debug_text
 LW A1, 0x10 (SP)
 JAL print
 ORI A0, R0, 0x10
@@ -316,6 +342,25 @@ ORI A0, R0, 0x10
 LW RA, 0x14 (SP)
 JR RA
 ADDIU SP, SP, 0x18
+
+@debug_text:
+.asciiz "%04x"
+.align 4
+
+/* exec_display_list
+Adds an instruction onto the RSP pipeline to jump and link to a display list
+args:
+	A0 - [segmented pointer] segmented pointer to the display list
+*/
+exec_display_list:
+LW T0, g_display_list_head
+LUI AT, 0x0600
+SW AT, 0x0 (T0)
+SW A0, 0x4 (T0)
+ADDIU T0, T0, 0x8
+SW.U T0, g_display_list_head
+JR RA
+SW.L T0, g_display_list_head
 
 /* encode_text
 Converts the text from ASCII to the encoding using by the game to print small
@@ -364,6 +409,17 @@ ORI AT, R0, 0xFF
 JR RA
 SB AT, 0x0 (A1)
 
+@text_encoding_table:
+.byte 0xFF
+.fill 32,0x9E
+.byte 0xF2, 0xF6, 0xFB, 0xF9, 0xF3, 0xE5, 0x3E, 0xE1, 0xE3, 0xFA, 0xFD, 0x6F, 0xE4, 0x3F, 0xD0
+.byte 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09
+.byte 0xE6, 0x9E, 0x52, 0x51, 0x53, 0xF4, 0xFC
+.byte 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23
+.byte 0x54, 0xFE, 0x55, 0x50, 0x9F, 0xF5
+.byte 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D
+.byte 0x57, 0x56, 0x58, 0xF7, 0x9E
+.align 4
 
 /* begin_print_encoded_text
 Sets up the graphics context to display regular text. Call this before calling
@@ -395,15 +451,9 @@ Finished printing encoded text. Call this after all of your calls to
 print_encoded_text
 */
 end_print_encoded_text:
-LW T0, g_display_list_head
-LUI AT, 0x0600
-SW AT, 0x0 (T0)
-LI AT, 0x02011D50
-SW AT, 0x4 (T0)
-ADDIU T0, T0, 0x8
-SW.U T0, g_display_list_head
-JR RA
-SW.L T0, g_display_list_head
+LUI A0, 0x0201
+J exec_display_list
+ORI A0, A0, 0x1D50
 
 /* wordcopy
 Copies a number of words from one location in RAM to another. More efficient
@@ -596,19 +646,283 @@ SLL A0, A0, 0xC
 JR RA
 OR V1, A0, A1
 
+/* copy_vector */
+copy_vector:
+L.S F0, 0x0 (A0)
+L.S F1, 0x4 (A0)
+L.S F2, 0x8 (A0)
+S.S F0, 0x0 (A1)
+S.S F1, 0x4 (A1)
+JR RA
+S.S F2, 0x8 (A1)
 
-@debug:
-.asciiz "%04x"
-.align 4
+/* get_magnitude */
+get_vector_magnitude:
+L.S F4, 0x0 (A0)
+L.S F5, 0x4 (A0)
+L.S F6, 0x8 (A0)
+MUL.S F4, F4, F4
+MUL.S F5, F5, F5
+MUL.S F6, F6, F6
+ADD.S F4, F4, F5
+ADD.S F4, F4, F6
+JR RA
+SQRT.S F0, F4
 
-@text_encoding_table:
-.byte 0xFF
-.fill 32,0x9E
-.byte 0xF2, 0xF6, 0xFB, 0xF9, 0xF3, 0xE5, 0x3E, 0xE1, 0xE3, 0xFA, 0xFD, 0x6F, 0xE4, 0x3F, 0xD0
-.byte 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09
-.byte 0xE6, 0x9E, 0x52, 0x51, 0x53, 0xF4, 0xFC
-.byte 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23
-.byte 0x54, 0xFE, 0x55, 0x50, 0x9F, 0xF5
-.byte 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D
-.byte 0x57, 0x56, 0x58, 0xF7, 0x9E
-.align 4
+/* normalize_vector */
+normalize_vector:
+L.S F0, 0x0 (A0)
+L.S F1, 0x4 (A0)
+L.S F2, 0x8 (A0)
+MUL.S F4, F0, F0
+MUL.S F5, F1, F1
+MUL.S F6, F2, F2
+ADD.S F3, F4, F5
+ADD.S F3, F3, F6
+MTC1 R0, F4
+SQRT.S F3, F3
+C.EQ.S F3, F4
+NOP
+BC1T @@return
+SLL V0, R0, 0x0
+DIV.S F0, F0, F3
+DIV.S F1, F1, F3
+DIV.S F2, F2, F3
+ORI V0, R0, 0x1
+@@return:
+S.S F0, 0x0 (A1)
+S.S F1, 0x4 (A1)
+JR RA
+S.S F2, 0x8 (A1)
+
+/* add_vectors_3d */
+add_vectors_3d:
+L.S F4, 0x0 (A0)
+L.S F5, 0x0 (A1)
+ADD.S F0, F4, F5
+S.S F0, 0x0 (A2)
+L.S F4, 0x4 (A0)
+L.S F5, 0x4 (A1)
+ADD.S F1, F4, F5
+S.S F1, 0x4 (A2)
+L.S F4, 0x8 (A0)
+L.S F5, 0x8 (A1)
+ADD.S F2, F4, F5
+JR RA
+S.S F2, 0x8 (A2)
+
+/* subtract_vectors_3d */
+subtract_vectors_3d:
+L.S F4, 0x0 (A0)
+L.S F5, 0x0 (A1)
+SUB.S F0, F4, F5
+S.S F0, 0x0 (A2)
+L.S F4, 0x4 (A0)
+L.S F5, 0x4 (A1)
+SUB.S F1, F4, F5
+S.S F1, 0x4 (A2)
+L.S F4, 0x8 (A0)
+L.S F5, 0x8 (A1)
+SUB.S F2, F4, F5
+JR RA
+S.S F2, 0x8 (A2)
+
+/* scale_vector_3d */
+scale_vector_3d:
+L.S F4, 0x0 (A0)
+MUL.S F0, F4, F12
+S.S F0, 0x0 (A1)
+L.S F4, 0x4 (A0)
+MUL.S F1, F4, F12
+S.S F1, 0x4 (A1)
+L.S F4, 0x8 (A0)
+MUL.S F2, F4, F12
+JR RA
+S.S F2, 0x8 (A1)
+
+/* get_distance_between_points */
+get_distance_between_points:
+ADDIU SP, SP, 0xFFE0
+SW RA, 0x1C (SP)
+SW A0, 0x20 (SP)
+JAL subtract_vectors_3d
+ADDIU A2, SP, 0x10
+JAL get_vector_magnitude
+SLL A0, A2, 0x0
+LW A0, 0x20 (SP)
+LW RA, 0x1C (SP)
+JR RA
+ADDIU SP, SP, 0x20
+
+/* turn_vector_3d
+Computes a unit vector that is a vector turned from the direction of vector A0
+towards the direction of vector A1, with a maximum angle change of A2. The
+result is stored in A3. All vectors are 3 dimensional.
+
+Does not alter the argument register values.
+args:
+	A0 - [pointer (float[3])] the source vector
+	A1 - [pointer (float[3])] the target vector
+	A2 - [short] the maximum angle change
+	A3 - [pointer (float[3])] allocated space for the result vector
+retuns:
+	V0 - [short] angle change
+*/
+turn_vector_3d:
+ADDIU SP, SP, 0xFFC0
+SW RA, 0x3C (SP)
+SW A0, 0x40 (SP)
+SW A1, 0x44 (SP)
+SW A2, 0x48 (SP)
+SW A3, 0x4C (SP)
+
+; Store S = normalized source vector at SP+0x10
+JAL normalize_vector
+ADDIU A1, SP, 0x10
+
+; if the source vector is a zero vector, return a zero vector
+BNE V0, R0, @@endif_source_vector_is_zero
+	LW T0, 0x4C (SP)
+	SW R0, 0x0 (T0)
+	SW R0, 0x4 (T0)
+	SW R0, 0x8 (T0)
+	B @@return
+	ORI V0, R0, 0x0
+@@endif_source_vector_is_zero:
+
+; Store T = normalized source vector at SP+0x1C
+LW A0, 0x44 (SP)
+JAL normalize_vector
+ADDIU A1, SP, 0x1C
+
+; if the target vector is a zero vector, return S
+BNE V0, R0, @@endif_target_vector_is_zero
+	@@return_normalized_source:
+	LI RA, @@return
+	ADDIU A0, SP, 0x10
+	LW A1, 0x4C (SP)
+	J copy_vector
+	ORI V0, R0, 0x0
+@@endif_target_vector_is_zero:
+
+ADDIU A0, SP, 0x10
+ADDIU A1, SP, 0x1C
+JAL cross_product
+ADDIU A2, SP, 0x28
+
+ADDIU A0, SP, 0x28
+JAL normalize_vector
+SLL A1, A0, 0x0
+
+; Store the value of ‖S⨯T‖, which is the sine of the difference of angles, in SP+0x34
+MTC1 R0, F4
+S.S F3, 0x34 (SP)
+
+; if S and T are parallel, return S
+LUI AT, 0x3F80
+C.EQ.S F3, F4
+MTC1 AT, F5
+BC1T @@return_normalized_source
+
+; Compute the angle between the two vectors, and store it in SP+0x38
+ADDIU A0, SP, 0x10
+JAL dot_product_3d
+ADDIU A1, SP, 0x1C
+MOV.S F12, F0
+JAL atan2s
+L.S F14, 0x34 (SP)
+SW V0, 0x38 (SP)
+
+; In case of rounding errors, check again that the angle is not 0 or 180
+ANDI V0, V0, 0xFFFF
+BEQ V0, R0, @@return_normalized_source
+ORI AT, R0, 0x8000
+SLTU AT, V0, AT
+BEQ AT, R0, @@return_normalized_source
+SW V0, 0x38 (SP)
+
+; If angle difference is within max angle change, return T
+LW T0, 0x48 (SP)
+ADDIU T0, T0, 0x1
+SLT AT, V0, T0
+BEQ AT, R0, @@endif_within_max_angle_range
+	LI RA, @@return
+	ADDIU A0, SP, 0x1C
+	J copy_vector
+	LW A1, 0x4C (SP)
+@@endif_within_max_angle_range:
+
+ADDIU A0, SP, 0x28
+ADDIU A1, SP, 0x10
+JAL cross_product
+SLL A2, A0, 0x0
+
+JAL cos_u16
+LW A0, 0x48 (SP)
+
+ADDIU A0, SP, 0x10
+SLL A1, A0, 0x0
+JAL scale_vector_3d
+MOV.S F12, F0
+
+JAL sin_u16
+LW A0, 0x48 (SP)
+
+ADDIU A0, SP, 0x1C
+SLL A1, A0, 0x0
+JAL scale_vector_3d
+MOV.S F12, F0
+
+ADDIU A0, SP, 0x10
+ADDIU A1, SP, 0x1C
+JAL add_vectors_3d
+LW A2, 0x4C (SP)
+
+LW V0, 0x38 (SP)
+
+@@return:
+LW RA, 0x3C (SP)
+LW A0, 0x40 (SP)
+LW A1, 0x44 (SP)
+LW A2, 0x48 (SP)
+LW A3, 0x4C (SP)
+JR RA
+ADDIU SP, SP, 0x40
+
+
+/* vector_to_yaw_and_pitch
+Computes the yaw and pitch of a vector.
+Preserves the value of the A0 register
+args:
+	A0 - [pointer] pointer to vector
+returns:
+	F0 - yaw
+	F1 - pitch
+*/
+vector_to_yaw_and_pitch:
+ADDIU SP, SP, 0xFFE8
+SW RA, 0x14 (SP)
+SW A0, 0x18 (SP)
+
+L.S F12, 0x8 (A0)
+JAL atan2s
+L.S F14, 0x0 (A0)
+SW V0, 0x10 (SP)
+
+L.S F4, 0x0 (A0)
+L.S F5, 0x8 (A0)
+MUL.S F4, F4, F4
+MUL.S F5, F5, F5
+ADD.S F4, F4, F5
+SQRT.S F12, F4
+L.S F14, 0x4 (A0)
+JAL atan2s
+NEG.S F14, F14
+
+SLL V1, V0, 0x0
+LW V0, 0x10 (SP)
+
+LW A0, 0x18 (SP)
+LW RA, 0x14 (SP)
+JR RA
+ADDIU SP, SP, 0x18
