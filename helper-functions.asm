@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.1.0
+Falcobuster's Labels and Helper Functions v3.1.1
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -646,7 +646,15 @@ SLL A0, A0, 0xC
 JR RA
 OR V1, A0, A1
 
-/* copy_vector */
+/* copy_vector
+Copy a 3-dimensional vector from one location to another
+Components of the copied vector are also stores in the F0 - F2 registers
+args:
+	A0 - [pointer] pointer to source vector
+	A1 - [pointer] pointer to memory to copy the vector to
+returns:
+	F0,F1,F2: [float] vector components
+*/
 copy_vector:
 L.S F0, 0x0 (A0)
 L.S F1, 0x4 (A0)
@@ -656,7 +664,13 @@ S.S F1, 0x4 (A1)
 JR RA
 S.S F2, 0x8 (A1)
 
-/* get_magnitude */
+/* get_vector_magnitude
+Computes the magnitude of a vector
+args:
+	A0 - [pointer] pointer to vector
+returns:
+	F0 - [float] magnitude
+*/
 get_vector_magnitude:
 L.S F4, 0x0 (A0)
 L.S F5, 0x4 (A0)
@@ -669,7 +683,16 @@ ADD.S F4, F4, F6
 JR RA
 SQRT.S F0, F4
 
-/* normalize_vector */
+/* normalize_vector
+Normalizes a vector and stores the result in A1. It is safe to use the same
+pointer for A0 and A1 in which case the vector is normalized in place.
+args:
+	A0 - [pointer] pointer to source vector
+	A1 - [pointer] pointer to memory to store the result vector in
+returns:
+	F0,F1,F2: [float] vector components
+	F3: [float] magnitude of the source vector
+*/
 normalize_vector:
 L.S F0, 0x0 (A0)
 L.S F1, 0x4 (A0)
@@ -695,7 +718,16 @@ S.S F1, 0x4 (A1)
 JR RA
 S.S F2, 0x8 (A1)
 
-/* add_vectors_3d */
+/* add_vectors_3d
+Adds two 3-dimensional vectors and stores the result in memory
+Does not alter the argument register values.
+args:
+	A0 - [pointer] pointer to vector A
+	A1 - [pointer] pointer to vector B
+	A2 - [pointer] pointer to where to store A+B
+returns:
+	F0,F1,F2: [float] result vector components
+*/
 add_vectors_3d:
 L.S F4, 0x0 (A0)
 L.S F5, 0x0 (A1)
@@ -711,7 +743,16 @@ ADD.S F2, F4, F5
 JR RA
 S.S F2, 0x8 (A2)
 
-/* subtract_vectors_3d */
+/* subtract_vectors_3d
+Subtracts two 3-dimensional vectors and stores the result in memory
+Does not alter the argument register values.
+args:
+	A0 - [pointer] pointer to vector A
+	A1 - [pointer] pointer to vector B
+	A2 - [pointer] pointer to where to store A-B
+returns:
+	F0,F1,F2: [float] result vector components
+*/
 subtract_vectors_3d:
 L.S F4, 0x0 (A0)
 L.S F5, 0x0 (A1)
@@ -727,7 +768,16 @@ SUB.S F2, F4, F5
 JR RA
 S.S F2, 0x8 (A2)
 
-/* scale_vector_3d */
+/* subtract_vectors_3d
+Multiplies a 3-dimensional vector by a scalar and stores the result in memory
+Does not alter the argument register values.
+args:
+	A0 - [pointer] pointer to vector
+	A1 - [pointer] pointer to where to store the result
+	F12 - [float] scalar value to multiply the result by
+returns:
+	F0,F1,F2: [float] result vector components
+*/
 scale_vector_3d:
 L.S F4, 0x0 (A0)
 MUL.S F0, F4, F12
@@ -740,7 +790,15 @@ MUL.S F2, F4, F12
 JR RA
 S.S F2, 0x8 (A1)
 
-/* get_distance_between_points */
+/* get_distance_between_points
+Gets the distance between two 3D points
+Does not alter the argument register values.
+args:
+	A0 - [pointer] pointer to point A
+	A1 - [pointer] pointer to point B
+returns:
+	F0 - distance
+*/
 get_distance_between_points:
 ADDIU SP, SP, 0xFFE0
 SW RA, 0x1C (SP)
@@ -877,6 +935,11 @@ ADDIU A0, SP, 0x10
 ADDIU A1, SP, 0x1C
 JAL add_vectors_3d
 LW A2, 0x4C (SP)
+
+; Normalize again to eliminate drift from rounding errors
+SLL A0, A2, 0x0
+JAL normalize_vector
+SLL A1, A2, 0x0
 
 LW V0, 0x38 (SP)
 
