@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.0.0
+Falcobuster's Labels and Helper Functions v3.2.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -86,6 +86,7 @@ C_BUTTON_B equ				0x4000
 C_BUTTON_A equ				0x8000
 
 ; Object struct
+o_flags equ 0x8C				; unsigned int
 o_move_angle_pitch equ 0xC4		; int (sign extended short) 
 o_move_angle_yaw equ 0xC8		; int (sign extended short)
 o_move_angle_roll equ 0xCC		; int (sign extended short)
@@ -96,8 +97,8 @@ o_interaction equ 0x130			; unsigned int
 o_interaction_status equ 0x134	; unsigned int
 o_state equ 0x14C				; unsigned int -- A.K.A. action
 o_timer equ 0x154				; int -- automatically increments every frame
-o_angle_to_mario equ 0x160		; int (sign extended short)
-o_distance_to_mario equ 0x15C	; float
+o_angle_to_mario equ 0x160		; int (sign extended short) (requires object flag to be set to auto update)
+o_distance_to_mario equ 0x15C	; float (requires object flag to be set to auto update)
 o_health equ 0x184				; int
 o_prev_obj equ 0x04				; pointer
 o_x equ 0xA0					; float
@@ -134,7 +135,19 @@ o_floor_ptr equ 0x1C0			; pointer -- pointer to floor triangle beneat the object
 o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doesn't work for Mario object)
 o_num_loot_coins equ 0x198		; integer
 o_animation_frame equ 0x40		; short
+o_animation_state equ 0xF0		; integer
 o_collision_pointer equ 0x218	; pointer
+; The following are graph node properties inherited by objects. So long as the 0x1 object flag is enabled, the object properties
+; are automatically copied to the corresponding graph node properties
+o_gfx_angle_pitch equ 0x1A
+o_gfx_angle_yaw equ 0x1C
+o_gfx_angle_roll equ 0x1E
+o_gfx_x equ 0x20
+o_gfx_y equ 0x24
+o_gfx_z equ 0x28
+o_gfx_scale_x equ 0x2C
+o_gfx_scale_y equ 0x30
+o_gfx_scale_z equ 0x34
 
 ; collision triangle struct
 t_collision_type equ 0x0		; unsigned short

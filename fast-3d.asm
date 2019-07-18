@@ -25,13 +25,14 @@
 	.word 0x00000000
 .endmacro
 
-.macro G_SET_MODE_2D_DRAWING_PRESET
-	; set render mode: 0x0F0A4000
-	.word 0xB900031D
-	.word 0x0F0A4000
-	; set cycle type: G_CYC_FILL
+.definelabel G_CYC_1CYCLE, 0
+.definelabel G_CYC_2CYCLE, 1
+.definelabel G_CYC_COPY, 2
+.definelabel G_CYC_FILL, 3
+
+.macro G_SET_CYCLE_TYPE, cycleType
 	.word 0xBA001402
-	.word 0x00300000
+	.word ( cycleType << 20 )
 .endmacro
 
 .macro G_SETFILLCOLOR, colour

@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.1.1
+Falcobuster's Labels and Helper Functions v3.2.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -432,14 +432,17 @@ args:
 */
 begin_print_encoded_text:
 LW T0, g_display_list_head
-LUI AT, 0x0600
+LI AT, 0xBA001402
 SW AT, 0x0 (T0)
-LI AT, 0x02011CC8
-SW AT, 0x4 (T0)
-LUI AT, 0xFB00
+SW R0, 0x4 (T0)
+LUI AT, 0x0600
 SW AT, 0x8 (T0)
-SW A0, 0xC (T0)
-ADDIU T0, T0, 0x10
+LI AT, 0x02011CC8
+SW AT, 0xC (T0)
+LUI AT, 0xFB00
+SW AT, 0x10 (T0)
+SW A0, 0x14 (T0)
+ADDIU T0, T0, 0x18
 SW.U T0, g_display_list_head
 JR RA
 SW.L T0, g_display_list_head
