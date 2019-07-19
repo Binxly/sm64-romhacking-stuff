@@ -5,6 +5,11 @@
 	.word 0x00000000
 .endmacro
 
+.macro G_RDPLOADSYNC
+	.word 0xE6000000
+	.word 0x00000000
+.endmacro
+
 .macro G_RDPPIPESYNC
 	.word 0xE7000000
 	.word 0x00000000

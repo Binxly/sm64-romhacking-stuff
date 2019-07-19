@@ -50,9 +50,9 @@ destination register. Both the source register value and the immediate value
 are interpreted as signed.
 */
 .macro MAXI, dst, src, imm
-	SLTI AT, src1, imm
+	SLTI AT, src, imm
 	BEQ AT, R0, @@end
-	SLL dst, src1, 0x0
+	SLL dst, src, 0x0
 	ADDIU dst, R0, imm
 	@@end:
 .endmacro
@@ -97,10 +97,10 @@ destination register. Both the source register value and the immediate value
 are interpreted as signed.
 */
 .macro MINI, dst, src, imm
-	SLTI AT, src1, imm
+	SLTI AT, src, imm
 	BEQ AT, R0, @@end
 	ADDIU dst, R0, imm
-	SLL dst, src1, 0x0
+	SLL dst, src, 0x0
 	@@end:
 .endmacro
 
