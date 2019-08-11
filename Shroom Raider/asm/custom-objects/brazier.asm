@@ -1,0 +1,13 @@
+.definelabel beh_brazier_impl,(org()-0x80000000) 
+; BHV_START OBJ_LIST_LEVEL
+BHV_OR_FLAGS o_flags, OBJ_FLAG_UPDATE_GFX
+BHV_DROP_TO_FLOOR
+BHV_ADD_FLOAT o_y, 300
+BHV_SPAWN_OBJECT 0x90, beh_checkpoint, 0
+BHV_ADD_FLOAT o_y, -300
+BHV_SET_INTERACTION 0x40000000
+BHV_SET_HITBOX 75, 220, 0
+BHV_SET_INT o_intangibility_timer, 0
+BHV_LOOP_BEGIN
+	BHV_SET_INT o_interaction_status, 0
+BHV_LOOP_END

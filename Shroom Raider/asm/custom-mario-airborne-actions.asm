@@ -1,0 +1,230 @@
+.definelabel ACT_WALLRUN,0x00000884
+
+.definelabel MAX_WALLRUN_TIME,0x3C
+
+mario_air_actions_shim:
+LI T0, g_mario
+LW T0, m_action (T0)
+
+LI AT, ACT_WALLRUN
+BEQ T0, AT, @wallrun
+NOP
+
+J 0x8026FB04
+NOP
+
+@wallrun: ;TODO: improve this to use quarter steps and allow ledgegrabbing
+ADDIU SP, SP, 0xFFD8
+SW RA, 0x24 (SP)
+SW S0, 0x20 (SP)
+
+LI S0, g_mario
+
+; Prevent Mario from getting stuck on certain walls
+LI T0, previous_mario_state
+LW T1, pms_action (T0)
+LI AT, ACT_WALLRUN
+BNE T1, AT, @endif_stuck_check
+	LI T1, mario_state_at_frame_start
+	L.S F4, pms_x (T0)
+	L.S F5, pms_z (T0)
+	L.S F6, pms_x (T1)
+	L.S F7, pms_z (T1)
+	SUB.S F4, F6, F4
+	SUB.S F5, F7, F5
+	MUL.S F4, F4, F4
+	MUL.S F5, F5, F5
+	LUI AT, 0x4310
+	MTC1 AT, F6
+	ADD.S F4, F4, F5
+	C.LT.S F4, F6
+	NOP
+	BC1T @bonk
+@endif_stuck_check:
+
+LHU A0, m_action_timer (S0)
+SETU AT, MAX_WALLRUN_TIME
+BEQ A0, AT, @fall
+ADDIU A0, A0, 0x1
+SH A0, m_action_timer (S0)
+
+JAL try_get_wall_angles
+NOP
+
+BEQ V0, R0, @fall
+SLTI AT, V1, 0x18E4
+BEQ AT, R0, @fall
+LW T0, m_wall_ptr (S0)
+LHU T0, t_collision_type (T0)
+; fall off if the wall is ice
+SETU AT, 0x2E
+BEQ T0, AT, @fall
+
+
+LW T0, m_controller (S0)
+BEQ T0, R0, @endif_wallkick
+NOP
+LHU T0, c_buttons_pressed (T0)
+; Fall if the Z trigger is pressed
+ANDI T1, T0, C_TRIGGER_Z
+BNE T1, R0, @delayed_fall
+@endif_drop_off:
+; Wall kick if A button pressed
+ANDI T0, T0, C_BUTTON_A
+BEQ T0, R0, @endif_wallkick
+	LI AT, 0x03000886 ; ACT_WALLJUMP
+	SW AT, m_action (S0)
+	SW R0, 0x18 (S0)
+	SW R0, 0x1C (S0)
+	SB R0, 0x2A (S0)
+	LUI AT, 0x4278
+	SW AT, m_speed_y (S0)
+	LW T0, m_wall_ptr (S0)
+	L.S F14, t_normal_x (T0)
+	JAL atan2s
+	L.S F12, t_normal_z (T0)
+	MOVE A1, V0
+	LH A0, m_angle_yaw (S0)
+	JAL turn_angle
+	SETU A2, 0x1C72
+	SH V0, m_angle_yaw (S0)
+	SH V0, 0x24 (S0)
+	LUI AT, 0x41C0
+	MTC1 AT, F5
+	L.S F4, m_speed_h (S0)
+	C.LT.S F4, F5
+	NOP
+	BC1F @endif_needs_speedup
+	NOP
+		S.S F5, m_speed_h (S0)
+	@endif_needs_speedup:
+	LUI A0, 0x2400
+	ORI A0, A0, 0x8081
+	LW A1, g_mario_obj_ptr
+	JAL set_sound
+	ADDIU A1, A1, 0x54
+	B @return
+	SETU V0, 0x1
+@endif_wallkick:
+
+L.S F6, m_speed_h (S0)
+MUL.S F4, F0, F6
+MUL.S F5, F1, F6
+S.S F4, m_speed_x (S0)
+SW R0, m_speed_y (S0)
+S.S F5, m_speed_z (S0)
+MOV.S F12, F1
+JAL atan2s
+MOV.S F14, F0
+SH V0, m_angle_yaw (S0)
+SH V0, 0x24 (S0)
+LW T0, g_mario_obj_ptr
+SW V0, o_face_angle_yaw (T0)
+SW V0, o_move_angle_yaw (T0)
+SH V0, o_gfx_angle_yaw (T0)
+
+LW T0, m_wall_ptr (S0)
+L.S F4, m_speed_z (S0)
+L.S F5, t_normal_x (T0)
+L.S F6, m_speed_x (S0)
+L.S F7, t_normal_z (T0)
+MUL.S F4, F4, F5
+MUL.S F5, F6, F7
+MTC1 R0, F6
+SUB.S F4, F4, F5
+C.LT.S F4, F6
+
+SETU T0, 0x1000
+BC1T @endif_tilt_left
+NOP
+	SUBU T0, R0, T0
+@endif_tilt_left:
+SH T0, 0x1C (SP)
+LW AT, m_speed_h (S0)
+SW AT, 0x10 (SP)
+LW T0, m_wall_ptr (S0)
+LW AT, t_normal_x (T0)
+SW AT, 0x14 (SP)
+LW AT, t_normal_z (T0)
+SW AT, 0x18 (SP)
+
+LI A1, 0x04000440 ; change to walking state when touching ground
+SETU A2, 0x72 ; running animation
+SETU A3, 0x1 ; allow ledge grabs from this state
+JAL 0x8026B444
+MOVE A0, S0
+
+LW AT, 0x10 (SP)
+SW AT, m_speed_h (S0)
+
+LH T1, 0x1C (SP)
+SH T1, m_angle_roll (S0)
+
+LW T0, g_mario_obj_ptr
+LUI AT, 0x8
+SW AT, 0x48 (T0)
+SW T1, o_face_angle_roll (T0)
+SH T1, 0x1E (T0)
+
+LUI AT, 0x41C8
+MTC1 AT, F6
+L.S F4, 0x14 (SP)
+L.S F5, 0x18 (SP)
+MUL.S F4, F4, F6
+MUL.S F5, F5, F6
+L.S F6, m_x (S0)
+L.S F7, m_z (S0)
+SUB.S F4, F6, F4
+SUB.S F5, F7, F5
+LW T0, g_mario_obj_ptr
+S.S F4, 0x20 (T0)
+S.S F5, 0x28 (T0)
+S.S F4, m_x (S0)
+S.S F5, m_z (S0)
+
+; Ensure wall pointer updates correctly
+LW AT, m_x (S0)
+SW AT, 0x10 (SP)
+LW AT, m_y (S0)
+SW AT, 0x14 (SP)
+LW AT, m_z (S0)
+SW AT, 0x18 (SP)
+ADDIU A0, SP, 0x10
+MOVE A1, R0
+JAL 0x80251A48
+LUI A2, 0x41C8
+BNE V0, R0, @found_wall
+ADDIU A0, SP, 0x10
+MOVE A1, R0
+JAL 0x80251A48
+LUI A2, 0x4248
+@found_wall:
+SW V0, m_wall_ptr (S0)
+
+B @return
+MOVE V0, R0
+
+@bonk:
+B (@fall+0x8)
+SETU AT, 0x8A7 ; bonk off wall
+
+@fall:
+LI AT, 0x0100088C ; freefall
+SW AT, m_action (S0)
+SW R0, 0x18 (S0)
+SW R0, 0x1C (S0)
+SETU V0, 0x1
+
+@return:
+LW S0, 0x20 (SP)
+LW RA, 0x24 (SP)
+JR RA
+ADDIU SP, SP, 0x28
+
+@delayed_fall:
+LI AT, 0x0100088C ; freefall
+SW AT, m_action (S0)
+SW R0, 0x18 (S0)
+SW R0, 0x1C (S0)
+B @return
+MOVE V0, R0
