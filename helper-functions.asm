@@ -649,6 +649,15 @@ SLL A0, A0, 0xC
 JR RA
 OR V1, A0, A1
 
+/* reset_camera
+Resets the camera to Mario's position. Call this after manually teleporting
+Mario to avoid the camera having to catch up.
+*/
+reset_camera:
+LW T0, 0x8032DDCC
+J 0x80286F68
+LW A0, 0x24 (T0)
+
 /* copy_vector
 Copy a 3-dimensional vector from one location to another
 Components of the copied vector are also stores in the F0 - F2 registers
@@ -962,8 +971,8 @@ Preserves the value of the A0 register
 args:
 	A0 - [pointer] pointer to vector
 returns:
-	F0 - yaw
-	F1 - pitch
+	V0 - yaw
+	V1 - pitch
 */
 vector_to_yaw_and_pitch:
 ADDIU SP, SP, 0xFFE8

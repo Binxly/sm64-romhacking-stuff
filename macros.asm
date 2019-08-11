@@ -87,8 +87,12 @@ destination register. Both the source register value and the immediate value
 are interpreted as unsigned.
 */
 .macro MAXIU, dst, src, imm
+	SLTIU AT, src, imm
+	BEQ AT, R0, @@end
+	MOVE AT, src
 	SETU AT, imm
-	MAXU dst, src, AT
+	@@end:
+	MOVE dst, AT
 .endmacro
 
 /* MIN
@@ -137,6 +141,10 @@ destination register. Both the source register value and the immediate value
 are interpreted as unsigned.
 */
 .macro MINIU, dst, src, imm
+	SLTIU AT, src, imm
+	BEQ AT, R0, @@end
 	SETU AT, imm
-	MINU dst, src, AT
+	MOVE AT, src
+	@@end:
+	MOVE dst, AT
 .endmacro

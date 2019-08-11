@@ -2,7 +2,7 @@
 .definelabel OBJ_LIST_GENERIC, 0x4 ; nothing too special about this list. Pretty much equivalent to OBJ_LIST_LEVEL
 .definelabel OBJ_LIST_INTERACTIVE, 0x5 ; objects that can detect hitbox collisions with other objects (not just Mario!)
 .definelabel OBJ_LIST_LEVEL, 0x6 ; nothing too special about this list. Pretty much equivalent to OBJ_LIST_GENERIC
-.definelabel OBJ_LIST_DEFAULT, 0x8 ; where objects without an object list explicitly set go. Nothing too special about this.
+.definelabel OBJ_LIST_DEFAULT, 0x8 ; where objects without an object list explicitly set go. Does not process collision
 .definelabel OBJ_LIST_SURFACE, 0x9 ; objects with triangle collision
 .definelabel OBJ_LIST_MAGNETIC, 0xA ; objects that Mario can climb (poles/trees) or that pull him in (tornado/whirlpool) or push him (wind)
 .definelabel OBJ_LIST_SPAWNER, 0xB ; objects that spawn other objects. Also bridges for some reason.
@@ -22,6 +22,9 @@
 .definelabel OBJ_PERSISTENT, 0x4000 ; when this object despawns, don't respawn it when re-entering the area (only use this on objects in the level script, not dynamically spawned objects which are always transient)
 
 .macro @SET, cmd, offset, value
+	.if offset < 0x88
+		.error "Cannot set value of property with offset less than 0x88"
+	.endif
 	.byte cmd, ((offset - 0x88) >> 2)
 	.halfword value
 .endmacro

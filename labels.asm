@@ -28,10 +28,13 @@ g_camera_fov equ 0x8033C5A4			; float -- camera vertical field of view (in degre
 g_save_file_num equ 0x8032DDF4		; short -- current save file number (starts at 1, game usually subtracts one from this before using it)
 g_display_list_head equ 0x8033B06C	; pointer
 g_global_timer equ 0x8032D5D4		; unsigned int
+g_cutscene_finished	equ 0x8033CBC8	; int (boolean) -- 0 if a cutscene is active, 1 otherwise
+g_timestop_flags equ 0x8033D480		; unsigned int
 
 ; Mario struct
 m_action equ 0xC		; unsigned int
 m_action_timer equ 0x1A	; unsigned short
+m_action_state equ 0x18 ; unsigned short
 m_action_arg equ 0x1C	; unsigned int
 m_hitstun equ 0x26		; short -- invulnerability frames
 m_peak_height equ 0xBC	; float -- Mario's highest y co-ordinate since he last touched the ground. Used for fall damage
@@ -93,8 +96,12 @@ o_move_angle_roll equ 0xCC		; int (sign extended short)
 o_face_angle_pitch equ 0xD0		; int (sign extended short)
 o_face_angle_yaw equ 0xD4		; int (sign extended short)
 o_face_angle_roll equ 0xD8		; int (sign extended short)
+o_angle_vel_pitch equ 0x114		; int (sign extended short)
+o_angle_vel_yaw equ 0x118		; int (sign extended short)
+o_angle_vel_roll equ 0x11C		; int (sign extended short)
 o_interaction equ 0x130			; unsigned int
 o_interaction_status equ 0x134	; unsigned int
+o_interaction_arg equ 0x190		; unsigned int -- checked by interaction processing code, what it does depends on the interaction
 o_state equ 0x14C				; unsigned int -- A.K.A. action
 o_timer equ 0x154				; int -- automatically increments every frame
 o_angle_to_mario equ 0x160		; int (sign extended short) (requires object flag to be set to auto update)
@@ -133,10 +140,17 @@ o_intangibility_timer equ 0x9C	; int -- make negative to be infinite
 o_opacity equ 0x17C				; int (but only the lower byte actually matters)
 o_floor_ptr equ 0x1C0			; pointer -- pointer to floor triangle beneat the object (doesn't work for Mario object)
 o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doesn't work for Mario object)
+o_wall_angle equ 0x1B4			; int (sign extended short) 
 o_num_loot_coins equ 0x198		; integer
+o_animation_pointer equ 0x120	; pointer
 o_animation_frame equ 0x40		; short
 o_animation_state equ 0xF0		; integer
 o_collision_pointer equ 0x218	; pointer
+o_wall_hitbox_radius equ 0x128	; float
+o_hitbox_radius equ 0x1F8		; float
+o_hitbox_height equ 0x1FC		; float
+o_collision_damage equ 0x180	; int
+o_active_flags equ 0x74			; short
 ; The following are graph node properties inherited by objects. So long as the 0x1 object flag is enabled, the object properties
 ; are automatically copied to the corresponding graph node properties
 o_gfx_angle_pitch equ 0x1A
@@ -263,10 +277,17 @@ o_move_angle_yaw, and then moves the object using these speeds
 decompose_speed_and_move equ 0x802A120C
 
 /* obj_update_floor_and_walls
-Upadates the object's references to floors and walls. Required to correctly
-resolve move flags and get collided with floors and walls
+Upadates the object's references to floors and walls, and sets the move flags
+accordingly. You must set o_wall_hitbox_radius for wall collision resolution to
+function properly.
 */
 obj_update_floor_and_walls equ 0x802A2320
+
+/* resolve_wall_collisions
+Updates the object's references to walls, and updates the move flags. You must
+set o_wall_hitbox_radius for wall collision resolution to function properly.
+*/
+obj_resolve_wall_collisions equ 0x802A1F3C
 
 
 /* process_collision
@@ -506,7 +527,7 @@ a2: [short] ?????? (set to 0)
 set_music equ 0x80320544
 
 /* memcpy
-Copy memory from one location to another. This just uses a loop of LBU and SH
+Copy memory from one location to another. This just uses a loop of LBU and SB
 instructions. If the size of the data you are copying is a multiple of 4, it is
 more efficient to instead use wordcopy (from helper-functions.asm)
 a0: [pointer] destination
@@ -541,6 +562,26 @@ a1: [pointer] target object
 [out] v0: [short] angle
 */
 angle_to_object equ 0x8029E694
+
+/* play_transition
+Plays a transition effect with the given colour
+a0: [short] transition type
+	0x00 Fade in
+	0x01 Fade out
+	0x08 Fade in from star
+	0x09 Fade out to star
+	0x0A Fade in from circle
+	0x0B Fade out to circle
+	0x10 Fade in from Mario
+	0x11 Fade out to Mario
+	0x12 Fade in from Bowser
+	0x13 Fade out to Bowser
+a1: [short] transition duration in frames
+a2: [byte] red
+a3: [byte] green
+SP+0x13: [byte] blue
+*/
+play_transition equ 0x8027B1A0
 
 /* save_file_get_star_flags
 a0: [short] save file minus 1
@@ -592,6 +633,26 @@ a0: [pointer] pointer to the 4x4 matrix of floats
 [ref] a1: [pointer] pointer to the 3D vector of shorts to transform
 */
 matrix_transform equ 0x8037A348
+
+/* start_cutscene
+Starts a cutscene with the given object as the focus. Does not automatically set
+the time stop state. You will need to do that yourself. To end the cutscene, set
+g_cutscene_finished to 1.
+a0: [usigned byte] cutscene ID (valid values are between 130 and 181. Star spawn is 173)
+a1: [pointer] object to focus
+*/
+start_cutscene equ 0x8029000C
+
+/* set_mario_animation
+a0: [pointer] pointer to mario struct (use g_mario)
+a1: [integer] animation ID
+*/
+set_mario_animation equ 0x802509B8
+
+/* obj_reset_to_home
+Resets the object's position to its home position
+*/
+obj_reset_to_home equ 0x802A184C
 
 
 ;; TODO: 0x8029f514 sets animation and animation speed? (int, float)
