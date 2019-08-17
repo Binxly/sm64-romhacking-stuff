@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.2.0
+Falcobuster's Labels and Helper Functions v3.3.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -32,36 +32,44 @@ g_cutscene_finished	equ 0x8033CBC8	; int (boolean) -- 0 if a cutscene is active,
 g_timestop_flags equ 0x8033D480		; unsigned int
 
 ; Mario struct
-m_action equ 0xC		; unsigned int
-m_action_timer equ 0x1A	; unsigned short
-m_action_state equ 0x18 ; unsigned short
-m_action_arg equ 0x1C	; unsigned int
-m_hitstun equ 0x26		; short -- invulnerability frames
-m_peak_height equ 0xBC	; float -- Mario's highest y co-ordinate since he last touched the ground. Used for fall damage
-m_health equ 0xAE		; short -- upper byte is integer health, lower byte is 1/256th health units
-m_area equ 0x90			; pointer
-m_camera equ 0x94		; pointer
-m_controller equ 0x9C	; pointer -- see controller struct below
-m_coins equ 0xA8		; short
-m_stars equ 0xAA		; short
-m_lives equ 0xAC		; short
-m_x equ 0x3C			; float
-m_y equ 0x40			; float
-m_z equ 0x44			; float
-m_speed_x equ 0x48		; float
-m_speed_y equ 0x4C		; float
-m_speed_z equ 0x50		; float
-m_speed_h equ 0x54		; float
-m_angle_pitch equ 0x2C	; short
-m_angle_yaw equ 0x2E	; short
-m_angle_roll equ 0x30	; short
-m_ceiling_ptr equ 0x64	; pointer
-m_wall_ptr equ 0x60		; pointer
-m_floor_ptr equ 0x68	; pointer
-m_floor_height equ 0x70	; float
+m_action equ 0xC			; unsigned int
+m_action_timer equ 0x1A		; unsigned short
+m_action_state equ 0x18 	; unsigned short
+m_action_arg equ 0x1C		; unsigned int
+m_hitstun equ 0x26			; short -- invulnerability frames
+m_peak_height equ 0xBC		; float -- Mario's highest y co-ordinate since he last touched the ground. Used for fall damage
+m_health equ 0xAE			; short -- upper byte is integer health, lower byte is 1/256th health units
+m_area equ 0x90				; pointer
+m_camera equ 0x94			; pointer
+m_controller equ 0x9C		; pointer -- see controller struct below
+m_coins equ 0xA8			; short
+m_stars equ 0xAA			; short
+m_lives equ 0xAC			; short
+m_x equ 0x3C				; float
+m_y equ 0x40				; float
+m_z equ 0x44				; float
+m_speed_x equ 0x48			; float
+m_speed_y equ 0x4C			; float
+m_speed_z equ 0x50			; float
+m_speed_h equ 0x54			; float
+m_slide_speed_x equ 0x58	; float
+m_slide_speed_z equ 0x5C	; float
+m_angle_pitch equ 0x2C		; short
+m_angle_yaw equ 0x2E		; short
+m_angle_roll equ 0x30		; short
+m_slide_angle_yaw equ 0x38	; short
+m_angle_vel_pitch equ 0x32 	; short -- angular velocity
+m_angle_vel_yaw equ 0x34 	; short	-- angular velocity
+m_angle_vel equ 0x36 		; short -- angular velocity
+m_ceiling_ptr equ 0x64		; pointer
+m_wall_ptr equ 0x60			; pointer
+m_floor_ptr equ 0x68		; pointer
+m_floor_height equ 0x70		; float
 m_ceiling_height equ 0x6C	; float
-m_hurt_counter equ 0xB2	; unisgned byte -- if > 0, damage mario by 1/4 health next frame and decrement
-m_heal_counter equ 0xB3 ; unsigned byte -- same as above, but heals
+m_hurt_counter equ 0xB2		; unisgned byte -- if > 0, damage mario by 1/4 health next frame and decrement
+m_heal_counter equ 0xB3 	; unsigned byte -- same as above, but heals
+m_held_object equ 0x7C		; pointer
+m_cap_timer equ 0xB6		; unsigned short
 
 ; Controller struct
 c_analog_short_x equ 0x0	; short -- analog stick horizontal position [-80,80]
@@ -111,6 +119,9 @@ o_prev_obj equ 0x04				; pointer
 o_x equ 0xA0					; float
 o_y equ 0xA4					; float
 o_z equ 0xA8					; float
+o_relative_x equ 0x138			; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
+o_relative_y equ 0x13C			; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
+o_relative_z equ 0x140			; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
 o_home_x equ 0x164				; float
 o_home_y equ 0x168				; float
 o_home_z equ 0x16C				; float
@@ -151,6 +162,7 @@ o_hitbox_radius equ 0x1F8		; float
 o_hitbox_height equ 0x1FC		; float
 o_collision_damage equ 0x180	; int
 o_active_flags equ 0x74			; short
+o_held_state equ 0x124			; unsigned int (0 = not held, 1 = held, 2 = thrown, 3 = dropped) -- see OBJ_HOLDABLE in behaviour-script-macros.asm
 ; The following are graph node properties inherited by objects. So long as the 0x1 object flag is enabled, the object properties
 ; are automatically copied to the corresponding graph node properties
 o_gfx_angle_pitch equ 0x1A
@@ -653,6 +665,3 @@ set_mario_animation equ 0x802509B8
 Resets the object's position to its home position
 */
 obj_reset_to_home equ 0x802A184C
-
-
-;; TODO: 0x8029f514 sets animation and animation speed? (int, float)
