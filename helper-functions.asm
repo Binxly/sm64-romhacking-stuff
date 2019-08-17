@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.4.0
+Falcobuster's Labels and Helper Functions v3.4.1
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -1003,25 +1003,25 @@ JR RA
 ADDIU SP, SP, 0x18
 
 /* obj_push_mario_out_of_hitbox
-Instantly pushes Mario out of the object's hitbox. Can push Mario out of bounds!
+Pushes Mario out of the object's hitbox. Can push Mario out of bounds!
 */
 obj_push_mario_out_of_hitbox:
 LW T0, g_current_obj_ptr
 LW T1, g_mario_obj_ptr
 L.S F7, (g_mario + m_y)
 L.S F5, o_hitbox_height (T1)
-SUB.S F4, F7, F5
+ADD.S F4, F7, F5
 L.S F6, o_hitbox_down_offset (T0)
-SUB.S F4, F4, F6
+ADD.S F4, F4, F6
 L.S F5, o_y (T0)
 C.LE.S F5, F4
 SUB.S F5, F5, F6
-BC1T @@return
+BC1F @@return
 L.S F4, o_hitbox_height (T0)
 ADD.S F4, F4, F5
 C.LT.S F7, F4
 NOP
-BC1T @@return
+BC1F @@return
 L.S F12, o_hitbox_radius (T0)
 J 0x802A3818 ; pushes Mario away- only cares about x and z co-ordinates
 NOP
