@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.3.0
+Falcobuster's Labels and Helper Functions v3.4.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -998,6 +998,77 @@ SLL V1, V0, 0x0
 LW V0, 0x10 (SP)
 
 LW A0, 0x18 (SP)
+LW RA, 0x14 (SP)
+JR RA
+ADDIU SP, SP, 0x18
+
+/* obj_push_mario_out_of_hitbox
+Instantly pushes Mario out of the object's hitbox. Can push Mario out of bounds!
+*/
+obj_push_mario_out_of_hitbox:
+LW T0, g_current_obj_ptr
+LW T1, g_mario_obj_ptr
+L.S F7, (g_mario + m_y)
+L.S F5, o_hitbox_height (T1)
+SUB.S F4, F7, F5
+L.S F6, o_hitbox_down_offset (T0)
+SUB.S F4, F4, F6
+L.S F5, o_y (T0)
+C.LE.S F5, F4
+SUB.S F5, F5, F6
+BC1T @@return
+L.S F4, o_hitbox_height (T0)
+ADD.S F4, F4, F5
+C.LT.S F7, F4
+NOP
+BC1T @@return
+L.S F12, o_hitbox_radius (T0)
+J 0x802A3818 ; pushes Mario away- only cares about x and z co-ordinates
+NOP
+@@return:
+JR RA
+NOP
+
+/* check_if_hitboxes_overlap
+Checks if the hitboxes of 2 objects overlap. Doesn't care if the objects would
+not normally collide with each other.
+args:
+	a0 - [pointer] object 1
+	a1 - [pointer] object 2
+*/
+check_if_hitboxes_overlap:
+ADDIU SP, SP, 0xFFE8
+SW RA, 0x14 (SP)
+SW A0, 0x18 (SP)
+JAL get_dist_2d
+SW A1, 0x1C (SP)
+LW A0, 0x18 (SP)
+LW A1, 0x1C (SP)
+L.S F4, o_hitbox_radius (A0)
+L.S F5, o_hitbox_radius (A1)
+ADD.S F4, F4, F5
+C.LE.S F4, F0
+MOVE V0, R0
+BC1T @@return
+L.S F4, o_y (A0)
+L.S F5, o_y (A1)
+L.S F6, o_hitbox_down_offset (A0)
+L.S F7, o_hitbox_down_offset (A1)
+SUB.S F4, F4, F6
+SUB.S F5, F5, F7
+L.S F6, o_hitbox_height (A0)
+L.S F7, o_hitbox_height (A1)
+ADD.S F6, F4, F6
+ADD.S F7, F5, F7
+C.LE.S F6, F5
+NOP
+BC1T @@return
+C.LE.S F7, F4
+NOP
+BC1T @@return
+NOP
+SETU V0, 0x1
+@@return:
 LW RA, 0x14 (SP)
 JR RA
 ADDIU SP, SP, 0x18

@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.3.0
+Falcobuster's Labels and Helper Functions v3.4.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -160,6 +160,7 @@ o_collision_pointer equ 0x218	; pointer
 o_wall_hitbox_radius equ 0x128	; float
 o_hitbox_radius equ 0x1F8		; float
 o_hitbox_height equ 0x1FC		; float
+o_hitbox_down_offset equ 0x208	; float
 o_collision_damage equ 0x180	; int
 o_active_flags equ 0x74			; short
 o_held_state equ 0x124			; unsigned int (0 = not held, 1 = held, 2 = thrown, 3 = dropped) -- see OBJ_HOLDABLE in behaviour-script-macros.asm
