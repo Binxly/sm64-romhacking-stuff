@@ -16,8 +16,9 @@
 .definelabel OBJ_AUTO_FACE_FORWARDS, 0x10 ; same as above, but also copies pitch and roll
 .definelabel OBJ_STORE_DISTANCE_TO_MARIO, 0x40 ; store the distance to Mario to o_distance_to_mario every frame
 .definelabel OBJ_ALWAYS_ACTIVE, 0x80 ; keep active even when far away from Mario
-.definelabel OBJ_RELATIVE_TO_PARENT, 0x200 ; transform the object relative to its parent using o_relative_[x|y|z] and store the world coordinates in o_[x|y|z]
+.definelabel OBJ_RELATIVE_TO_PARENT, 0x200 ; transform the object relative to its parent using o_relative_[x|y|z] and store the world coordinates in o_[x|y|z] (parent object must have OBJ_COMPUTE_MATRIX_TRANSFORM flag for this to work)
 .definelabel OBJ_HOLDABLE, 0x400 ; marks the object as being holdable with its current behaviour script. Picking up an object with this flag results in its o_held_state being updated. Picking up an object without this flag results in it changing to a different held object behaviour script.
+.definelabel OBJ_COMPUTE_MATRIX_TRANSFORM, 0x820 ; computes and stores the object's matrix transform based on its position and angle. This is required for OBJ_RELATIVE_TO_PARENT to work on child objects
 .definelabel OBJ_STORE_ANGLE_TO_MARIO, 0x2000 ; store the angle to Mario in the xz plane to o_angle_to_mario every frame
 .definelabel OBJ_PERSISTENT, 0x4000 ; when this object despawns, don't respawn it when re-entering the area (only use this on objects in the level script, not dynamically spawned objects which are always transient)
 
