@@ -162,7 +162,7 @@
 
 ; Sets the object's physics properties. All values except for wallHitboxRadius are divided by 100
 .macro BHV_SET_PHYSICS, wallHitboxRadius, gravity, bounciness, drag, friction, bouyancy
-	.word 0x30000000,
+	.word 0x30000000
 	.halfword wallHitboxRadius, gravity, bounciness, drag, friction, bouyancy
 	.word 0x00000000
 .endmacro
