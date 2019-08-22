@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.4.1
+Falcobuster's Labels and Helper Functions v3.5.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -1072,3 +1072,47 @@ SETU V0, 0x1
 LW RA, 0x14 (SP)
 JR RA
 ADDIU SP, SP, 0x18
+
+/* vertical_angle_to_object
+Returns the vertical angle (pitch) from the first object to the second
+args:
+	A0 - [pointer] source object
+	A1 - [pointer] target object
+	A2 - [float] source object vertical offset
+	A3 - [float] target object vertical offset
+returns:
+	V0 - [short] angle
+*/
+vertical_angle_to_object:
+ADDIU SP, SP, 0xFFE8
+SW RA, 0x14 (SP)
+SW A0, 0x18 (SP)
+SW A1, 0x1C (SP)
+SW A2, 0x20 (SP)
+JAL get_dist_2d
+SW A3, 0x24 (SP)
+LW A0, 0x18 (SP)
+LW A1, 0x1C (SP)
+L.S F4, o_y (A0)
+L.S F6, 0x20 (SP)
+ADD.S F4, F4, F6
+L.S F5, o_y (A1)
+L.S F6, 0x24 (SP)
+ADD.S F5, F5, F6
+SUB.S F14, F5, F4
+JAL atan2s
+MOV.S F12, F0
+LW RA, 0x14 (SP)
+JR RA
+ADDIU SP, SP, 0x18
+
+/* end_cutscene
+Ends the cutscene, restoring the camera to its normal behaviour
+*/
+SB R0, 0x8032DF50
+SB R0, 0x8032DF54
+SETU T0, 1
+SW T0, g_cutscene_finished
+LW T0, 0x8033CBD0
+JR RA
+SB R0, 0x30 (T0)
