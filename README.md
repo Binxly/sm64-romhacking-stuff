@@ -23,7 +23,7 @@ in important structs.
 ### helper-functions.asm
 This file contains a number of helper functions I have writen to accomplish
 common things such as trigonometric functions, vector manipulation, text
-printing, etc.
+printing, etc. You must also include *labels.asm* to use this.
 
 ### behaviour-script-macros.asm
 This file contains macros for behaviour script commands.
