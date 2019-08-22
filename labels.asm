@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.4.1
+Falcobuster's Labels and Helper Functions v3.5.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -164,6 +164,7 @@ o_hitbox_down_offset equ 0x208	; float
 o_collision_damage equ 0x180	; int
 o_active_flags equ 0x74			; short
 o_held_state equ 0x124			; unsigned int (0 = not held, 1 = held, 2 = thrown, 3 = dropped) -- see OBJ_HOLDABLE in behaviour-script-macros.asm
+o_behaviour equ 0x20C			; pointer -- virtual memory address (NOT segmented) of the behaviour script
 ; The following are graph node properties inherited by objects. So long as the 0x1 object flag is enabled, the object properties
 ; are automatically copied to the corresponding graph node properties
 o_gfx_angle_pitch equ 0x1A
@@ -326,7 +327,7 @@ set_mario_speed equ 0x80251708
 
 /* set_mario_action
 Sets Mario's action. This is different than just directly setting m_action, since
-it also executes code based on the action transition
+it also sets/reset the state, arguments, and timer
 a0: [pointer] pointer to mario struct (use g_mario)
 a1: [uint] action
 a2: [uint] action argument
@@ -649,8 +650,8 @@ matrix_transform equ 0x8037A348
 
 /* start_cutscene
 Starts a cutscene with the given object as the focus. Does not automatically set
-the time stop state. You will need to do that yourself. To end the cutscene, set
-g_cutscene_finished to 1.
+the time stop state. You will need to do that yourself. To end the cutscene, use
+the end_cutscene function in helper-functions.asm
 a0: [usigned byte] cutscene ID (valid values are between 130 and 181. Star spawn is 173)
 a1: [pointer] object to focus
 */
