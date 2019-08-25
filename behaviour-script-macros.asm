@@ -1,3 +1,11 @@
+/* labels.asm + helper-functions.asm + behaviour-script-macros.asm
+Falcobuster's Labels and Helper Functions v4.1.0
+These two files are public domain. You may use, modify, and distribute them
+however you wish without restriction. Preserving this header comment is
+appreciated, but not required.
+https://gitlab.com/mpharoah/sm64-romhacking-stuff
+*/
+
 .definelabel OBJ_LIST_EXPLOSION, 0x2 ; things that can damage other objects (bombs, explosions, and bouncy cork boxes)
 .definelabel OBJ_LIST_GENERIC, 0x4 ; nothing too special about this list. Pretty much equivalent to OBJ_LIST_LEVEL
 .definelabel OBJ_LIST_INTERACTIVE, 0x5 ; objects that can detect hitbox collisions with other objects (not just Mario!)

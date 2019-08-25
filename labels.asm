@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v4.0.0
+Falcobuster's Labels and Helper Functions v4.1.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -227,6 +227,64 @@ MF_HIT_EDGE equ				0x0400
 MF_OVER_LAVA equ			0x0800
 MF_JUST_LEFT_WATER equ		0x1000
 MF_JUST_BOUNCED equ			0x2000
+
+; interactions
+INT_OWL equ				0x00000001
+INT_GRABBABLE equ		0x00000002
+INT_DOOR equ			0x00000004
+INT_DAMAGE equ			0x00000008
+INT_COIN equ			0x00000010
+INT_CAP equ				0x00000020
+INT_POLE equ			0x00000040
+INT_KOOPA equ			0x00000080
+INT_SPINY equ			0x00000100
+INT_BREAKABLE equ		0x00000200
+INT_WIND equ			0x00000400
+INT_WARP_DOOR equ		0x00000800
+INT_STAR_OR_KEY equ		0x00001000
+INT_WARP equ			0x00002000
+INT_CANNON equ			0x00004000
+INT_BOUNCE_TOP equ		0x00008000
+INT_WATER_RING equ		0x00010000
+INT_BULLY equ			0x00020000
+INT_FLAME equ			0x00040000
+INT_KOOPA_SHELL equ		0x00080000
+INT_TRAP_TURN equ		0x00100000
+INT_MR_BLIZZARD equ		0x00200000
+INT_HIT_FROM_BELOW equ	0x00400000
+INT_TEXT equ			0x00800000
+INT_TORNADO equ			0x01000000
+INT_WHIRLPOOL equ		0x02000000
+INT_CLAM_OR_BUBBA equ	0x04000000
+INT_BBH_ENTRANCE equ	0x08000000
+INT_SNUFIT_BULLET equ	0x10000000
+INT_SHOCK equ			0x20000000
+INT_SOLID equ			0x40000000
+
+; flags used by o_interaction_arg
+; for INT_WARP
+IA_FADING_WARP equ		0x0001
+; for damaging interactions
+IA_DELAY_IFRAMS equ		0x0002
+IA_BIG_KNOCKBACK equ	0x0008
+; for INT_GRABBABLE
+IA_GRABS_MARIO equ		0x0004 ; Also makes the object heavy
+IA_HOLDABLE_NPC equ		0x0010 ; Allows the object to be gently dropped, and sets vertical speed to 0 when dropped with no forwards velocity
+IA_DROP_IMMEDIATELY equ	0x0040 ; This gets set by grabbable NPCs that talk to Mario to make him drop them after the dialog is finished
+IA_KICKABLE equ			0x0100
+IA_NOT_GRABBABLE equ	000200 ; Used by Heavy-Ho to allow it to throw Mario, without Mario being able to pick it up
+; for INT_DOOR
+IA_STAR_DOOR equ		0x0020
+; for INT_BOUNCE_TOP
+IA_TWIRL_BOUNCE equ		0x0080
+; for INT_STAR_OR_KEY
+IA_NO_EXIT equ			0x0400
+IA_GRAND_STAR equ		0x0800
+; for INT_TEXT
+IA_SIGN equ				0x1000
+IA_NPC equ				0x4000
+; for INT_CLAM_OR_BUBBA
+IA_EATS_MARIO equ		0x2000
 
 ; collision triangle struct
 t_collision_type equ 0x0	; unsigned short
