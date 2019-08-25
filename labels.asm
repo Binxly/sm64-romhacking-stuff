@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v3.5.0
+Falcobuster's Labels and Helper Functions v4.0.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -32,44 +32,54 @@ g_cutscene_finished	equ 0x8033CBC8	; int (boolean) -- 0 if a cutscene is active,
 g_timestop_flags equ 0x8033D480		; unsigned int
 
 ; Mario struct
-m_action equ 0xC			; unsigned int
-m_action_timer equ 0x1A		; unsigned short
-m_action_state equ 0x18 	; unsigned short
-m_action_arg equ 0x1C		; unsigned int
-m_hitstun equ 0x26			; short -- invulnerability frames
-m_peak_height equ 0xBC		; float -- Mario's highest y co-ordinate since he last touched the ground. Used for fall damage
-m_health equ 0xAE			; short -- upper byte is integer health, lower byte is 1/256th health units
-m_area equ 0x90				; pointer
-m_camera equ 0x94			; pointer
-m_controller equ 0x9C		; pointer -- see controller struct below
-m_coins equ 0xA8			; short
-m_stars equ 0xAA			; short
-m_lives equ 0xAC			; short
-m_x equ 0x3C				; float
-m_y equ 0x40				; float
-m_z equ 0x44				; float
-m_speed_x equ 0x48			; float
-m_speed_y equ 0x4C			; float
-m_speed_z equ 0x50			; float
-m_speed_h equ 0x54			; float
-m_slide_speed_x equ 0x58	; float
-m_slide_speed_z equ 0x5C	; float
-m_angle_pitch equ 0x2C		; short
-m_angle_yaw equ 0x2E		; short
-m_angle_roll equ 0x30		; short
-m_slide_angle_yaw equ 0x38	; short
-m_angle_vel_pitch equ 0x32 	; short -- angular velocity
-m_angle_vel_yaw equ 0x34 	; short	-- angular velocity
-m_angle_vel equ 0x36 		; short -- angular velocity
-m_ceiling_ptr equ 0x64		; pointer
-m_wall_ptr equ 0x60			; pointer
-m_floor_ptr equ 0x68		; pointer
-m_floor_height equ 0x70		; float
-m_ceiling_height equ 0x6C	; float
-m_hurt_counter equ 0xB2		; unisgned byte -- if > 0, damage mario by 1/4 health next frame and decrement
-m_heal_counter equ 0xB3 	; unsigned byte -- same as above, but heals
-m_held_object equ 0x7C		; pointer
-m_cap_timer equ 0xB6		; unsigned short
+m_action equ 0xC				; unsigned int
+m_prev_action equ 0x10			; unsigned int
+m_subaction equ 0x18 			; unsigned short
+m_action_timer equ 0x1A			; unsigned short
+m_action_arg equ 0x1C			; unsigned int
+m_iframes equ 0x26				; short -- invulnerability frames
+m_angle equ 0x2C				; short[3]
+	m_angle_pitch equ 0x2C		; short
+	m_angle_yaw equ 0x2E		; short
+	m_angle_roll equ 0x30		; short
+m_angle_vel equ 0x32			; short[3] -- angular velocity
+	m_angle_vel_pitch equ 0x32 	; short
+	m_angle_vel_yaw equ 0x34 	; short
+	m_angle_vel equ 0x36 		; short
+m_slide_angle_yaw equ 0x38		; short
+m_position equ 0x3C				; float[3]
+	m_x equ 0x3C				; float
+	m_y equ 0x40				; float
+	m_z equ 0x44				; float
+m_speed equ 0x48				; float[3]
+	m_speed_x equ 0x48			; float
+	m_speed_y equ 0x4C			; float
+	m_speed_z equ 0x50			; float
+m_speed_h equ 0x54				; float
+m_slide_speed_x equ 0x58		; float
+m_slide_speed_z equ 0x5C		; float
+m_wall_ptr equ 0x60				; pointer -- referenced wall
+m_ceiling_ptr equ 0x64			; pointer
+m_floor_ptr equ 0x68			; pointer
+m_ceiling_height equ 0x6C		; float
+m_floor_height equ 0x70			; float
+m_floor_pitch equ 0x74			; short
+m_water_level equ 0x76			; short
+m_held_object equ 0x7C			; pointer
+m_area equ 0x90					; pointer
+m_camera equ 0x94				; pointer
+m_controller equ 0x9C			; pointer -- see controller struct below
+m_coins equ 0xA8				; short -- not automatically reflected by the HUD (see g_displayed_coins)
+m_stars equ 0xAA				; short
+m_lives equ 0xAD				; short
+m_health equ 0xAE				; short (fixed point) -- upper byte is integer health, lower byte is 1/256th health units
+m_hurt_counter equ 0xB2			; unisgned byte -- if > 0, damage mario by 1/4 health next frame and decrement
+m_heal_counter equ 0xB3 		; unsigned byte -- same as above, but heals
+m_squish_timer equ 0xB4			; unsigned byte -- decrements; 0 if not squished
+m_opacity equ 0xB5				; unsigned byte -- opacity while in a fading warp
+m_cap_timer equ 0xB6			; unsigned short
+m_peak_height equ 0xBC			; float -- Mario's highest y co-ordinate since he last touched the ground. Used for fall damage
+
 
 ; Controller struct
 c_analog_short_x equ 0x0	; short -- analog stick horizontal position [-80,80]
@@ -97,94 +107,110 @@ C_BUTTON_B equ				0x4000
 C_BUTTON_A equ				0x8000
 
 ; Object struct
-o_flags equ 0x8C				; unsigned int
-o_move_angle_pitch equ 0xC4		; int (sign extended short) 
-o_move_angle_yaw equ 0xC8		; int (sign extended short)
-o_move_angle_roll equ 0xCC		; int (sign extended short)
-o_face_angle_pitch equ 0xD0		; int (sign extended short)
-o_face_angle_yaw equ 0xD4		; int (sign extended short)
-o_face_angle_roll equ 0xD8		; int (sign extended short)
-o_angle_vel_pitch equ 0x114		; int (sign extended short)
-o_angle_vel_yaw equ 0x118		; int (sign extended short)
-o_angle_vel_roll equ 0x11C		; int (sign extended short)
-o_interaction equ 0x130			; unsigned int
-o_interaction_status equ 0x134	; unsigned int
-o_interaction_arg equ 0x190		; unsigned int -- checked by interaction processing code, what it does depends on the interaction
-o_state equ 0x14C				; unsigned int -- A.K.A. action
-o_timer equ 0x154				; int -- automatically increments every frame
-o_angle_to_mario equ 0x160		; int (sign extended short) (requires object flag to be set to auto update)
-o_distance_to_mario equ 0x15C	; float (requires object flag to be set to auto update)
-o_health equ 0x184				; int
+; The following are graph node properties inherited by objects. So long as the 0x1 object flag is enabled, the object properties
+; are automatically copied to the corresponding graph node properties
+o_gfx_flags equ 0x2				; unsigned short
+o_animation_frame equ 0x40		; short
+o_parent equ 0x68				; pointer
 o_prev_obj equ 0x04				; pointer
-o_x equ 0xA0					; float
-o_y equ 0xA4					; float
-o_z equ 0xA8					; float
-o_relative_x equ 0x138			; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
-o_relative_y equ 0x13C			; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
-o_relative_z equ 0x140			; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
-o_home_x equ 0x164				; float
-o_home_y equ 0x168				; float
-o_home_z equ 0x16C				; float
-o_gravity equ 0xE4				; float -- normal gravity is negative (-4 for Mario)
-o_bounce equ 0x158				; float
-o_buoyancy equ 0x174			; float
-o_speed_h equ 0xB8				; float -- horizontal speed. Use the decompose_speed function to set o_speed_x and o_speed_z
-o_speed_x equ 0xAC				; float
-o_speed_y equ 0xB0				; float
-o_speed_z equ 0xB4				; float
-o_move_flags equ 0xEC			; unsigned int
+o_gfx_angle equ 0x1A			; short[3] -- angle used for rendering; automatically copied from o_position if the OBJ_FLAG_UPDATE_GFX flag is set
+	o_gfx_angle_pitch equ 0x1A	; short
+	o_gfx_angle_yaw equ 0x1C	; short
+	o_gfx_angle_roll equ 0x1E	; short
+o_gfx_position					; float[3] -- position the object is rendered at; automatically copied from o_position if the OBJ_FLAG_UPDATE_GFX flag is set
+	o_gfx_x equ 0x20			; float
+	o_gfx_y equ 0x24			; float
+	o_gfx_z equ 0x28			; float
+o_scale equ 0x2C				; float[3]
+	o_scale_x equ 0x2C			; float
+	o_scale_y equ 0x30			; float
+	o_scale_z equ 0x34			; float
+o_active_flags equ 0x74			; short -- OR with 0x20 to allow the object to be active during timestop
 o_num_collided_objects equ 0x76	; short
 o_collided_objects equ 0x78		; pointer[4] -- 4 pointers stored contiguously
-o_gfx_flags equ 0x2				; unsigned short
-o_scale_x equ 0x2C				; float
-o_scale_y equ 0x30				; float
-o_scale_z equ 0x34				; float
+o_flags equ 0x8C				; unsigned int
+o_intangibility_timer equ 0x9C	; int -- make negative to be infinite
+o_position equ 0xA0				; float[3]
+	o_x equ 0xA0				; float
+	o_y equ 0xA4				; float
+	o_z equ 0xA8				; float
+o_speed_equ 0xAC				; float[3]
+	o_speed_x equ 0xAC			; float
+	o_speed_y equ 0xB0			; float
+	o_speed_z equ 0xB4			; float
+o_speed_h equ 0xB8				; float -- horizontal speed. Use the decompose_speed function to set o_speed_x and o_speed_z
+o_move_angle equ 0xC4			; int[3] (sign extended short) 
+	o_move_angle_pitch equ 0xC4	; int (sign extended short) 
+	o_move_angle_yaw equ 0xC8	; int (sign extended short)
+	o_move_angle_roll equ 0xCC	; int (sign extended short)
+o_face_angle equ 0xD0			; int[3] (sign extended short)
+	o_face_angle_pitch equ 0xD0	; int (sign extended short)
+	o_face_angle_yaw equ 0xD4	; int (sign extended short)
+	o_face_angle_roll equ 0xD8	; int (sign extended short)
+o_gfx_y_offset equ 0xDC			; float -- offsets the visual y position from the object's actual y position
+o_gravity equ 0xE4				; float -- normal gravity is negative (-4 for Mario)
+o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doesn't work for Mario object- use m_floor_height on the Mario struct instead)
+o_move_flags equ 0xEC			; unsigned int
+o_animation_state equ 0xF0		; integer
+; offsets 0xF4 to 0x0x110 are specific to the behaviour, and can be safely used for your custom objects
+o_angle_vel						; int[3] (sign extended short)
+	o_angle_vel_pitch equ 0x114	; int (sign extended short)
+	o_angle_vel_yaw equ 0x118	; int (sign extended short)
+	o_angle_vel_roll equ 0x11C	; int (sign extended short)
+o_animation_pointer equ 0x120	; pointer
+o_held_state equ 0x124			; unsigned int (0 = not held, 1 = held, 2 = thrown, 3 = dropped) -- see OBJ_HOLDABLE in behaviour-script-macros.asm
+o_wall_hitbox_radius equ 0x128	; float (used by collision processing functions to detect collisions with walls)
+o_drag equ 0x12C				; float
+o_interaction equ 0x130			; unsigned int
+o_interaction_status equ 0x134	; unsigned int
+o_relative_position equ 0x138	; float[3] -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
+	o_relative_x equ 0x138		; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
+	o_relative_y equ 0x13C		; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
+	o_relative_z equ 0x140		; float -- See OBJ_RELATIVE_TO_PARENT in behaviour-script-macros.asm
 o_param2 equ 0x144				; int -- for some reason, the game copies B.Param 2 here ¯\_(ツ)_/¯
+o_state equ 0x14C				; unsigned int -- A.K.A. action
+o_substate equ 0x150			; unsigned int -- automatically reset to 0 when the action changes
+o_timer equ 0x154				; int -- automatically increments every frame and resets to 0 when the state changes
+o_bounce equ 0x158				; float
+o_distance_to_mario equ 0x15C	; float -- automatically computed if OBJ_STORE_DISTANCE_TO_MARIO object flag is set
+o_angle_to_mario equ 0x160		; float -- automatically computed if OBJ_STORE_ANGLE_TO_MARIO object flag is set
+o_home equ 0x164				; float[3] -- automatically initialized if BHV_STORE_HOME is called in the behaviour script
+	o_home_x equ 0x164			; float
+	o_home_y equ 0x168			; float
+	o_home_z equ 0x16C			; float
+o_friction equ 0x170			; float
+o_buoyancy equ 0x174			; float
+o_opacity equ 0x17C				; int (but only the lower byte actually matters)
+o_collision_damage equ 0x180	; int -- or coin value if using the coin interaction
+o_health equ 0x184				; int
 o_arg0 equ 0x188				; byte -- B. Param 1
 o_arg1 equ 0x189				; byte -- B. Param 2
 o_arg2 equ 0x18A				; byte -- B. Param 3
 o_arg3 equ 0x18B				; byte -- B. Param 4
-o_parent equ 0x68				; pointer
-o_render_distance equ 0x19C		; float
+o_prev_state equ 0x18C			; unsigned int -- automatically set by the game as you change o_state
+o_interaction_arg equ 0x190		; unsigned int -- checked by interaction processing code, what it does depends on the interaction
 o_collision_distance equ 0x194	; float
-o_intangibility_timer equ 0x9C	; int -- make negative to be infinite
-o_opacity equ 0x17C				; int (but only the lower byte actually matters)
-o_floor_ptr equ 0x1C0			; pointer -- pointer to floor triangle beneat the object (doesn't work for Mario object)
-o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doesn't work for Mario object)
-o_wall_angle equ 0x1B4			; int (sign extended short) 
 o_num_loot_coins equ 0x198		; integer
-o_animation_pointer equ 0x120	; pointer
-o_animation_frame equ 0x40		; short
-o_animation_state equ 0xF0		; integer
-o_collision_pointer equ 0x218	; pointer
-o_wall_hitbox_radius equ 0x128	; float
+o_render_distance equ 0x19C		; float
+o_room equ 0x1A0				; int -- ID of the room the object is in
+o_wall_angle equ 0x1B4			; int (sign extended short) 
+o_floor_ptr equ 0x1C0			; pointer -- pointer to floor triangle beneath the object (doesn't work for Mario object, use m_floor_ptr on the Mario struct)
 o_hitbox_radius equ 0x1F8		; float
 o_hitbox_height equ 0x1FC		; float
+o_hurtbox_radius equ 0x200		; float
+o_hurtbox_height equ 0x204		; float
 o_hitbox_down_offset equ 0x208	; float
-o_collision_damage equ 0x180	; int
-o_active_flags equ 0x74			; short
-o_held_state equ 0x124			; unsigned int (0 = not held, 1 = held, 2 = thrown, 3 = dropped) -- see OBJ_HOLDABLE in behaviour-script-macros.asm
 o_behaviour equ 0x20C			; pointer -- virtual memory address (NOT segmented) of the behaviour script
-; The following are graph node properties inherited by objects. So long as the 0x1 object flag is enabled, the object properties
-; are automatically copied to the corresponding graph node properties
-o_gfx_angle_pitch equ 0x1A
-o_gfx_angle_yaw equ 0x1C
-o_gfx_angle_roll equ 0x1E
-o_gfx_x equ 0x20
-o_gfx_y equ 0x24
-o_gfx_z equ 0x28
-o_gfx_scale_x equ 0x2C
-o_gfx_scale_y equ 0x30
-o_gfx_scale_z equ 0x34
+o_collision_pointer equ 0x218	; pointer
 
 ; collision triangle struct
-t_collision_type equ 0x0		; unsigned short
-t_object equ 0x2C				; pointer -- pointer to the object this collision triangle belongs to, or NULL (0) if it's level geometry
-t_min_y equ 0x6					; short
-t_max_y equ 0x8					; short
-t_normal_x equ 0x1C				; float
-t_normal_y equ 0x20				; float
-t_normal_z equ 0x24				; float
+t_collision_type equ 0x0	; unsigned short
+t_min_y equ 0x6				; short
+t_max_y equ 0x8				; short
+t_normal_x equ 0x1C			; float
+t_normal_y equ 0x20			; float
+t_normal_z equ 0x24			; float
+t_object equ 0x2C			; pointer -- pointer to the object this collision triangle belongs to, or NULL (0) if it's level geometry
 
 ; camera state struct (read-only)
 ; These values get copied into the struct from other places.
