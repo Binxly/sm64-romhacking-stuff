@@ -125,7 +125,7 @@ o_scale equ 0x2C				; float[3]
 	o_scale_x equ 0x2C			; float
 	o_scale_y equ 0x30			; float
 	o_scale_z equ 0x34			; float
-o_active_flags equ 0x74			; short -- OR with 0x20 to allow the object to be active during timestop
+o_active_flags equ 0x74			; short
 o_num_collided_objects equ 0x76	; short
 o_collided_objects equ 0x78		; pointer[4] -- 4 pointers stored contiguously
 o_flags equ 0x8C				; unsigned int
@@ -202,6 +202,31 @@ o_hurtbox_height equ 0x204		; float
 o_hitbox_down_offset equ 0x208	; float
 o_behaviour equ 0x20C			; pointer -- virtual memory address (NOT segmented) of the behaviour script
 o_collision_pointer equ 0x218	; pointer
+
+; flags used by o_active_flags
+AF_IS_OBJECT equ			0x0001 ; if this is not set, the object is effectively deleted (represents an empty object slot)
+AF_FAR_AWAY equ				0x0002 ; set if the object is farther away than its render distance, and the OBJ_ALWAYS_ACTIVE object flag is not set
+AF_DIFFERENT_ROOM equ		0x0008 ; in a different room than Mario
+AF_UNIMPORTANT equ			0x0010 ; objects in the OBJ_LIST_PARTICLES list have this set
+AF_ACTIVE_IN_TIMESTOP equ	0x0020 ; behaviour is still processed while objects are in timestop
+AF_GHOSTLY equ				0x0040 ; does not collide with Vanish Cap surfaces
+AF_IGNORES_WATER equ		0x0400 ; always detects water level as -11000
+
+; flags used by o_move_flags
+MF_JUST_LANDED equ			0x0001
+MF_GROUNDED equ				0x0002 ; oddly enough, this is mutally exclusive with MF_JUST_LANDED, so you may want to check both
+MF_JUST_LEFT_GROUND equ		0x0004
+MF_JUST_ENTERED_WATER equ	0x0008
+MF_AT_WATER_SURFACE equ		0x0010
+MF_UNDERWATER equ			0x0020 ; not set if MF_GROUNDED_UNDERWATER is
+MF_GROUNDED_UNDERWATER equ	0x0040
+MF_AIRBORNE equ				0x0080
+; 0x100 is unused
+MF_HIT_WALL equ				0x0200
+MF_HIT_EDGE equ				0x0400
+MF_OVER_LAVA equ			0x0800
+MF_JUST_LEFT_WATER equ		0x1000
+MF_JUST_BOUNCED equ			0x2000
 
 ; collision triangle struct
 t_collision_type equ 0x0	; unsigned short
@@ -362,6 +387,7 @@ set_mario_action equ 0x80252CF4
 
 /* mark_object_for_deletion
 Marks the object slot as free, effectively deleting the object
+(you can also just set o_active_flags to 0 instead)
 a0: [pointer] object to delete
 */
 mark_object_for_deletion equ 0x802A0568
