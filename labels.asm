@@ -45,7 +45,7 @@ m_angle equ 0x2C				; short[3]
 m_angle_vel equ 0x32			; short[3] -- angular velocity
 	m_angle_vel_pitch equ 0x32 	; short
 	m_angle_vel_yaw equ 0x34 	; short
-	m_angle_vel equ 0x36 		; short
+	m_angle_vel_roll equ 0x36 		; short
 m_slide_angle_yaw equ 0x38		; short
 m_position equ 0x3C				; float[3]
 	m_x equ 0x3C				; float
@@ -117,7 +117,7 @@ o_gfx_angle equ 0x1A			; short[3] -- angle used for rendering; automatically cop
 	o_gfx_angle_pitch equ 0x1A	; short
 	o_gfx_angle_yaw equ 0x1C	; short
 	o_gfx_angle_roll equ 0x1E	; short
-o_gfx_position					; float[3] -- position the object is rendered at; automatically copied from o_position if the OBJ_FLAG_UPDATE_GFX flag is set
+o_gfx_position equ 0x20			; float[3] -- position the object is rendered at; automatically copied from o_position if the OBJ_FLAG_UPDATE_GFX flag is set
 	o_gfx_x equ 0x20			; float
 	o_gfx_y equ 0x24			; float
 	o_gfx_z equ 0x28			; float
@@ -134,7 +134,7 @@ o_position equ 0xA0				; float[3]
 	o_x equ 0xA0				; float
 	o_y equ 0xA4				; float
 	o_z equ 0xA8				; float
-o_speed_equ 0xAC				; float[3]
+o_speed equ 0xAC				; float[3]
 	o_speed_x equ 0xAC			; float
 	o_speed_y equ 0xB0			; float
 	o_speed_z equ 0xB4			; float
@@ -153,7 +153,7 @@ o_floor_height equ 0xE8			; float -- height of the floor beneath the object (doe
 o_move_flags equ 0xEC			; unsigned int
 o_animation_state equ 0xF0		; integer
 ; offsets 0xF4 to 0x0x110 are specific to the behaviour, and can be safely used for your custom objects
-o_angle_vel						; int[3] (sign extended short)
+o_angle_vel equ 0x114			; int[3] (sign extended short)
 	o_angle_vel_pitch equ 0x114	; int (sign extended short)
 	o_angle_vel_yaw equ 0x118	; int (sign extended short)
 	o_angle_vel_roll equ 0x11C	; int (sign extended short)

@@ -148,3 +148,42 @@ are interpreted as unsigned.
 	@@end:
 	MOVE dst, AT
 .endmacro
+
+/* MIN.S
+Stores the smaller of the two floating point values in the destination register
+*/
+.macro MIN.S, dst, src1, src2
+	C.LE.S src1, src2
+	NOP
+	BC1F @@use_src2
+	NOP
+	B @@end
+	MOV.S dst, src1
+	@@use_src2:
+	MOV.S dst, src2
+	@@end:
+.endmacro
+
+/* MAX.S
+Stores the larger of the two floating point values in the destination register
+*/
+.macro MAX.S, dst, src1, src2
+	C.LE.S src1, src2
+	NOP
+	BC1T @@use_src2
+	NOP
+	B @@end
+	MOV.S dst, src1
+	@@use_src2:
+	MOV.S dst, src2
+	@@end:
+.endmacro
+
+/* SHORT
+Sign extends the 16-bit value in the source register and stores it in
+the destination register
+*/
+.macro SHORT, dst, src
+	SLL dst, src, 0x10
+	SRA dst, dst, 0x10
+.endmacro
