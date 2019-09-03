@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm + behaviour-script-macros.asm
-Falcobuster's Labels and Helper Functions v4.1.0
+Falcobuster's Labels and Helper Functions v4.1.1
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.

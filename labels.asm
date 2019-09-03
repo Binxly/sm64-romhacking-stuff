@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v4.1.0
+Falcobuster's Labels and Helper Functions v4.1.1
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -272,7 +272,7 @@ IA_GRABS_MARIO equ		0x0004 ; Also makes the object heavy
 IA_HOLDABLE_NPC equ		0x0010 ; Allows the object to be gently dropped, and sets vertical speed to 0 when dropped with no forwards velocity
 IA_DROP_IMMEDIATELY equ	0x0040 ; This gets set by grabbable NPCs that talk to Mario to make him drop them after the dialog is finished
 IA_KICKABLE equ			0x0100
-IA_NOT_GRABBABLE equ	000200 ; Used by Heavy-Ho to allow it to throw Mario, without Mario being able to pick it up
+IA_NOT_GRABBABLE equ	0x0200 ; Used by Heavy-Ho to allow it to throw Mario, without Mario being able to pick it up
 ; for INT_DOOR
 IA_STAR_DOOR equ		0x0020
 ; for INT_BOUNCE_TOP
