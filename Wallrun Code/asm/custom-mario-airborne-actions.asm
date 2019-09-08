@@ -214,13 +214,13 @@ MOVE V0, R0
 
 @bonk:
 B (@fall+0x8)
-SETU AT, 0x8A7 ; bonk off wall
+SETU A1, 0x8A7 ; bonk off wall
 
 @fall:
-LI AT, 0x0100088C ; freefall
-SW AT, m_action (S0)
-SW R0, 0x18 (S0)
-SW R0, 0x1C (S0)
+LI A1, 0x0100088C ; freefall
+MOVE A0, S0
+JAL set_mario_action
+MOVE A2, R0
 SETU V0, 0x1
 
 @return:
@@ -230,9 +230,9 @@ JR RA
 ADDIU SP, SP, 0x28
 
 @delayed_fall:
-LI AT, 0x0100088C ; freefall
-SW AT, m_action (S0)
-SW R0, 0x18 (S0)
-SW R0, 0x1C (S0)
+MOVE A0, S0
+LI A1, 0x0100088C ; freefall
+JAL set_mario_action
+MOVE A2, R0
 B @return
 MOVE V0, R0

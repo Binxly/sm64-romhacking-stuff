@@ -59,10 +59,10 @@ MOV.S F14, F0
 LI T0, g_mario
 SH V0, m_angle_yaw (T0)
 SH V0, 0x24 (T0)
-LI AT, ACT_WALLRUN
-SW AT, m_action (T0)
-SH R0, m_action_timer (T0)
-SH R0, m_subaction (T0)
+MOVE A0, T0
+LI A1, ACT_WALLRUN
+JAL set_mario_action
+MOVE A2, R0
 
 @@return:
 LW RA, 0x1C (SP)
