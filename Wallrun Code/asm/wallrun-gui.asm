@@ -54,7 +54,7 @@ SH AT, 0x12 (SP)
 
 SETU A2, @STAMINA_BAR_WIDTH
 JAL create_draw_rect_command
-SETU A3, 0x14
+SETU A3, @STAMINA_BAR_HEIGHT
 
 LI T0, @draw_border
 SW V0, 0x0 (T0)
@@ -64,7 +64,7 @@ LHU A0, 0x10 (SP)
 LHU A1, 0x12 (SP)
 SETU A2, (@STAMINA_BAR_WIDTH-8)
 JAL create_draw_rect_command
-SETU A3, 0xC
+SETU A3, (@STAMINA_BAR_HEIGHT-8)
 
 LI T0, @draw_background
 SW V0, 0x0 (T0)
@@ -84,7 +84,7 @@ LHU A1, 0x12 (SP)
 SUBU A2, T1, T0
 ANDI A2, A2, 0xFFFC
 JAL create_draw_rect_command
-SETU A3, 0xC
+SETU A3, (@STAMINA_BAR_HEIGHT-8)
 
 LI T0, @draw_bar
 SW V0, 0x0 (T0)
