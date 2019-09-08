@@ -19,3 +19,6 @@ your ROMhack, then either
 If you have your own custom assembly code, you can integrate it into this code.
 The `master-armips-gui.asm` file contains basic code hooks you can use to add
 your own custom code into the ROM.
+
+You can tweak the wallrunning behaviour easily by editing the `wallrun-config.asm`
+file in the `asm` directory.
