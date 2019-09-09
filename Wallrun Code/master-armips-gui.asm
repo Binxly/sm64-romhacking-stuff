@@ -96,4 +96,3 @@ JAL mario_air_actions_shim
 .orga 0xFDB40
 J wall_collision_loop_shim
 ADDIU T5, T4, 0x1
-.word 0x1480FE46
