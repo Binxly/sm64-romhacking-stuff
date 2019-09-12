@@ -23,30 +23,6 @@ LI S0, g_mario
 
 SH R0, m_subaction (S0)
 
-; Prevent Mario from getting stuck on certain walls
-/*
-LI T0, previous_mario_state
-LW T1, pms_action (T0)
-LI AT, ACT_WALLRUN
-BNE T1, AT, @endif_stuck_check
-	LI T1, mario_state_at_frame_start
-	L.S F4, pms_x (T0)
-	L.S F5, pms_z (T0)
-	L.S F6, pms_x (T1)
-	L.S F7, pms_z (T1)
-	SUB.S F4, F6, F4
-	SUB.S F5, F7, F5
-	MUL.S F4, F4, F4
-	MUL.S F5, F5, F5
-	LUI AT, 0x4310
-	MTC1 AT, F6
-	ADD.S F4, F4, F5
-	C.LT.S F4, F6
-	NOP
-	BC1T @bonk
-@endif_stuck_check:
-*/
-
 LHU A0, m_action_timer (S0)
 SETU AT, MAX_WALLRUN_TIME
 BEQ A0, AT, @fall
