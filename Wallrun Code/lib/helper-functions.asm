@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm + behaviour-script-macros.asm
-Falcobuster's Labels and Helper Functions v4.1.1
+Falcobuster's Labels and Helper Functions v4.2.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -1109,9 +1109,10 @@ ADDIU SP, SP, 0x18
 /* end_cutscene
 Ends the cutscene, restoring the camera to its normal behaviour
 */
+end_cutscene:
 SB R0, 0x8032DF50
 SB R0, 0x8032DF54
-SETU T0, 1
+ORI T0, R0, 1
 SW T0, g_cutscene_finished
 LW T0, 0x8033CBD0
 JR RA

@@ -2,6 +2,8 @@
 *.z64
 *.blend1
 *.srm
+*.state
+*.state.auto
 vtxc
 bg
 transdl

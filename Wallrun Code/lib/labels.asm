@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v4.1.1
+Falcobuster's Labels and Helper Functions v4.2.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -777,3 +777,19 @@ set_mario_animation equ 0x802509B8
 Resets the object's position to its home position
 */
 obj_reset_to_home equ 0x802A184C
+
+/* int_to_string
+Converts a signed integer into an encoded string and store it at the given
+position and advance the string position index. The string is not null
+terminated. The string is store in ASCII format. You muist call encode_text (in
+helper_functions.asm) to encode the text if you want to use this with the
+print_encoded_text function. Note that negative values are prefixed with an M
+instead of a hyphen.
+a0: [int] the number to convert to a string
+a1: [int] numerical base (eg. 10 for decimal, 16 for hex, etc.)
+a2: [pointer to string] pointer to where the resulting numeric string will be written
+a3: [pointer to integer] pointer to a number that will be incremented by the number of characters writen
+SP+0x13: [unsigned byte] minimum width (number is padded if the numeric string is shorter than this)
+SP+0x17: [byte (boolean)] if non-zero, the string is 0 padded if shorter than minimum width (otherwise, padded with 0xFF)
+*/
+int_to_string equ 0x802D5E54

@@ -54,11 +54,11 @@ BNE T1, R0, @delayed_fall
 ; Wall kick if A button pressed
 ANDI T0, T0, C_BUTTON_A
 BEQ T0, R0, @endif_wallkick
-	LI AT, 0x03000886 ; ACT_WALLJUMP
-	SW AT, m_action (S0)
-	SW R0, 0x18 (S0)
-	SW R0, 0x1C (S0)
-	SB R0, 0x2A (S0)
+	MOVE A0, S0
+	LI A1, 0x03000886 ; ACT_WALLJUMP
+	JAL set_mario_action
+	MOVE A2, R0
+	SB R0, 0x2A (S0) ; wall kick timer
 	LUI AT, 0x4278
 	SW AT, m_speed_y (S0)
 	LW T0, m_wall_ptr (S0)
@@ -152,7 +152,7 @@ LW T0, g_mario_obj_ptr
 LUI AT, 0x8
 SW AT, 0x48 (T0)
 SW T1, o_face_angle_roll (T0)
-SH T1, 0x1E (T0)
+SH T1, o_gfx_angle_roll (T0)
 
 LI.S F6, 25
 L.S F4, 0x14 (SP)
