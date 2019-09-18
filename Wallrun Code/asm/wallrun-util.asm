@@ -67,12 +67,7 @@ returns:
 v0 [bool]: non-zero if the surface supports wallrunning, 0 if it does not
 */
 collision_type_supports_wallrunning:
-@@VANISH_CAP_SURFACE equ 0x7B
-@@FIRST_PAINTING_SURFACE equ 0xD3
-@@LAST_PAINTING_SURFACE equ 0xFC
-
 ANDI A0, A0, 0xFF
-
 LW T0, (g_mario+0x4)
 ANDI T0, T0, 0x2 ; non-zero if Mario has vanish cap
 BEQ T0, R0, @@endif_has_vanish_cap
