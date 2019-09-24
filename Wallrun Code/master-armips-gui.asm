@@ -1,3 +1,6 @@
+.headersize 0x80245000
+.relativeinclude on
+
 .include "lib/labels.asm"
 .include "lib/macros.asm"
 .include "lib/behaviour-script-macros.asm"
