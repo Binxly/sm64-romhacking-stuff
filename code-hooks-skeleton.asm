@@ -79,6 +79,16 @@ LW RA, 0x14 (SP)
 JR RA
 ADDIU SP, SP, 0x18
 
+@one_time_setup:
+ADDIU SP, SP, 0xFFE8
+SW RA, 0x14 (SP)
+
+; import your code here that runs once before the first iteration of the mainloop
+
+LW RA, 0x14 (SP)
+JR RA
+ADDIU SP, SP, 0x18
+
 ; import your code here that gets loaded into free space
 ; don't use .org/.orga/.headersize in these files
 
@@ -93,6 +103,9 @@ J @on_every_mario_active_frame
 
 .orga 0x9EE48
 J @gui_extensions
+
+.orga 0x2FD4
+J @one_time_setup
 
 ; import your code here that overwrites the ROM in specific places
 ; you can freely use .org/.orga/.headersize here (and all files should start with .orga)
