@@ -7,12 +7,22 @@
 @MAX_SIZE equ 0x11200
 
 .orga 0x396C
-.area 0x24
+.area 0x54
+JAL 0x80322F40 ; commit all writes from the CPU cache to physical RAM
+NOP
 LI A0, @RAM_START
 LI A1, @ROM_START
 LI.U A2, @ROM_END
-JAL 0x80278504
+JAL 0x80278504 ; DMA read
 LI.L A2, @ROM_END
+LI A0, @RAM_START
+LI.U A1, @MAX_SIZE
+JAL 0x80324610 ; Invalidate instruction cache
+LI.L A1, @MAX_SIZE
+LI A0, @RAM_START
+LI.U A1, @MAX_SIZE
+JAL 0x803243B0 ; Invalidate data cache
+LI.L A1, @MAX_SIZE
 J @restore_overwritten_memory_setup_code
 NOP
 @end_of_overwritten_memory_setup_code:
@@ -31,9 +41,21 @@ LUI A0, 0x8034
 LUI A1, 0x8034
 ADDIU A1, A1, 0xB044
 ADDIU A0, A0, 0xB028
-LI RA, @end_of_overwritten_memory_setup_code
-J 0x803225A0
+JAL 0x803225A0
 ADDIU A2, R0, 0x1
+LUI A0, 0x8034
+LUI A1, 0x8034
+ADDIU A1, A1, 0xB040
+ADDIU A0, A0, 0xB010
+JAL 0x803225A0
+ADDIU A2, R0, 0x1
+LUI T6, 0x8000
+LUI AT, 0x1FFF
+ORI AT, AT, 0xFFFF
+ADDIU T6, T6, 0x0400
+AND T7, T6, AT
+J @end_of_overwritten_memory_setup_code
+LUI AT, 0x8034
 
 @on_every_mario_active_frame:
 ADDIU SP, SP, 0xFFE8

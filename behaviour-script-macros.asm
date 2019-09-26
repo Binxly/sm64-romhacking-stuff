@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm + behaviour-script-macros.asm
-Falcobuster's Labels and Helper Functions v4.2.0
+Falcobuster's Labels and Helper Functions v4.3.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -13,7 +13,7 @@ https://gitlab.com/mpharoah/sm64-romhacking-stuff
 .definelabel OBJ_LIST_DEFAULT, 0x8 ; where objects without an object list explicitly set go. Does not process collision
 .definelabel OBJ_LIST_SURFACE, 0x9 ; objects with triangle collision
 .definelabel OBJ_LIST_MAGNETIC, 0xA ; objects that Mario can climb (poles/trees) or that pull him in (tornado/whirlpool) or push him (wind)
-.definelabel OBJ_LIST_SPAWNER, 0xB ; objects that spawn other objects. Also bridges for some reason.
+.definelabel OBJ_LIST_SPAWNER, 0xB ; objects that spawn other objects. Objects in this list get processed first
 .definelabel OBJ_LIST_PARTICLES, 0xC ; unimportant objects that will get automatically despawned if more important objects need to load
 
 ; Object flags (for use with BHV_OR_FLAGS o_flags, <flags>)

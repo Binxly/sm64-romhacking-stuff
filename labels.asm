@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v4.2.0
+Falcobuster's Labels and Helper Functions v4.3.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -793,3 +793,27 @@ SP+0x13: [unsigned byte] minimum width (number is padded if the numeric string i
 SP+0x17: [byte (boolean)] if non-zero, the string is 0 padded if shorter than minimum width (otherwise, padded with 0xFF)
 */
 int_to_string equ 0x802D5E54
+
+/* commit_all_writes
+Commits all data writes from the CPU cache to physical RAM. Call this before
+swapping segment data. This is the osWritebackDCacheAll function from libultra.
+*/
+commit_all_writes equ 0x80322F40
+
+/* invalidate_instruction_cache
+Invalidates the instruction cache for the given region of memory. Call this
+after doing self-modifying code or DMAing instructions from the ROM. This is the
+osInvalICache function from libultra.
+a0: [pointer] pointer to the start of memory to clear the cache for
+a1: [unsigned int] size of the memory region in bytes
+*/
+invalidate_instruction_cache equ 0x80324610
+
+/* invalidate_data_cache
+Invalidates the data cache for the given region of memory. Call this after
+DMAing non-instruction data from the ROM. This is the osInvalDCache function
+from libultra.
+a0: [pointer] pointer to the start of memory to clear the cache for
+a1: [unsigned int] size of the memory region in bytes
+*/
+invalidate_data_cache equ 0x803243B0
