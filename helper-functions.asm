@@ -1117,3 +1117,17 @@ SW T0, g_cutscene_finished
 LW T0, 0x8033CBD0
 JR RA
 SB R0, 0x30 (T0)
+
+/* set_model
+Sets the model of the given object
+args:
+	A0 - [pointer] object to change the model of
+	A1 - [int] model ID
+*/
+set_model:
+LI T0, 0x8032DDC4
+SLL AT, A1, 2
+ADDU T0, T0, AT
+LW T0, 0x0 (T0)
+JR RA
+SW T0, 0x14 (A0)
