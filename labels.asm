@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v4.3.0
+Falcobuster's Labels and Helper Functions v4.4.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -600,8 +600,8 @@ take_damage_and_knockback equ 0x8024D998
 Shows a dialog message and puts Mario into the reading message action. You should
 call this every frame until it returns a non-zero value
 a0: [int] something to do with Mario's state?? (use 2)
-a1: [int] dialog flags??? (use 1)
-a2: [int] dialog type maybe???? (use 0xA2)
+a1: [int] dialog flags? (use 0x1 for normal dialog, or 0x11 to leave timestop enabled after the dialog closes)
+a2: [int] cutscene ID (use 0xA2 for normal text, and 0xA3 for text with a yes/no option)
 a3: [int] messageId (same ID you would use in text manager)
 [out] v0: [bool] dialog response (0 if dialog has not been closed yet)
 */
@@ -817,3 +817,13 @@ a0: [pointer] pointer to the start of memory to clear the cache for
 a1: [unsigned int] size of the memory region in bytes
 */
 invalidate_data_cache equ 0x803243B0
+
+/* lower_background_audio_volume
+Fades the music volume down to a quieter volume
+*/
+lower_background_audio_volume equ 0x80290BA4
+
+/* restore_background_audio_volume
+Fades the music volume back to its normal level
+*/
+restore_background_audio_volume equ 0x80320EC4
