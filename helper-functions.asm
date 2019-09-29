@@ -1067,7 +1067,7 @@ C.LE.S F7, F4
 NOP
 BC1T @@return
 NOP
-SETU V0, 0x1
+ORI V0, R0, 0x1
 @@return:
 LW RA, 0x14 (SP)
 JR RA
