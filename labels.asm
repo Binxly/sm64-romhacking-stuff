@@ -835,3 +835,11 @@ increment the counter to mash out of a grab.
 [out] v0: [bool] non-zero if mashing out
 */
 get_is_mashing_out equ 0x802A5358
+
+/* spawn_coins
+Spawns a number of yellow coins at the object's position. The coins have a
+random speed in a random direction.
+a0: [pointer] pointer to object where the coins should spawn at
+a1: [byte] number of coins to spawn
+*/
+spawn_coins equ 0x802E5760
