@@ -827,3 +827,11 @@ lower_background_audio_volume equ 0x80290BA4
 Fades the music volume back to its normal level
 */
 restore_background_audio_volume equ 0x80320EC4
+
+/* get_is_mashing_out
+Returns a non-zero value if the player is performing an input that should
+increment the counter to mash out of a grab.
+(See https://www.youtube.com/watch?v=_R8c70zuJSw for mechanics)
+[out] v0: [bool] non-zero if mashing out
+*/
+get_is_mashing_out equ 0x802A5358
