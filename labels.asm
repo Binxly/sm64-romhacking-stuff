@@ -469,12 +469,13 @@ a0: [segmented pointer] behaviour -- same value you would use in Quad64
 get_nearest_object_with_behaviour equ 0x8029F95C
 
 /* atan2s
-Computes the arctangent, returning the resulting angle as a short. Note that
-this function takes the difference in Z co-ordinates first, THEN the difference
-in X co-ordinates second, which is the opposite of what an atan2 function would
-normally do. Because reasons.
-f12: [float] difference in z co-ordinates
-f14: [float] difference in x co-ordinates
+Computes the arctangent, returning the resulting angle as a short. The first
+argument is the position in the axis that the angle is measured from, and the
+second argument is the position in the axis perpendicular to the other. In the
+case of computing the yaw, these are the differences in the z and x coordinates
+respectively.
+f12: [float] relative position in the z-axis (axis at 0 degrees)
+f14: [float] relative position in the x-axis (axis at 90 degrees)
 [out] v0: [short] angle
 */
 atan2s equ 0x8037A9A8
