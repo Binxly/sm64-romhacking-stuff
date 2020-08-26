@@ -1,0 +1,23 @@
+beh_toad_house_intact_impl:
+; BHV_START OBJ_LIST_SURFACE
+BHV_SET_COLLISION bb_level_24_object_Toad_House__Intact__collision
+BHV_JUMP @beh_toad_house_common
+
+beh_toad_house_damaged_impl:
+; BHV_START OBJ_LIST_SURFACE
+BHV_SET_COLLISION bb_level_24_object_Toad_House__Damaged__collision
+BHV_JUMP @beh_toad_house_common
+
+beh_toad_house_razed_impl:
+; BHV_START OBJ_LIST_SURFACE
+BHV_SET_COLLISION bb_level_24_object_Toad_House__Razed__collision
+BHV_JUMP @beh_toad_house_common
+
+.definelabel @beh_toad_house_common, (org() - 0x80000000)
+BHV_OR_FLAGS o_flags, OBJ_FLAG_UPDATE_GFX | OBJ_ALWAYS_ACTIVE | OBJ_STORE_DISTANCE_TO_MARIO
+BHV_SET_FLOAT o_render_distance, 0x7FFF
+BHV_SET_FLOAT o_collision_distance, 950
+BHV_SET_INT o_intangibility_timer, 0
+BHV_LOOP_BEGIN
+	BHV_EXEC process_collision
+BHV_LOOP_END

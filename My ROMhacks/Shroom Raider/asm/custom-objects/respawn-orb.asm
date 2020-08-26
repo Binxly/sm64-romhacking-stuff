@@ -25,13 +25,13 @@ NOP
 @loop:
 LW T0, g_current_obj_ptr
 LW T1, o_timer (T0)
-ORI AT, R0, 0x8
-SUBU T1, AT, T1
+ORI AT, R0, 0x8 
+SUBU T1, AT, T1 ; t1 = 8 - timer
 MTC1 T1, F4
 LUI AT, 0x3E80
 MTC1 AT, F5
 CVT.S.W F4, F4
-MUL.S F4, F4, F5
+MUL.S F4, F4, F5 ; f4 = (8 - timer) / 4
 MFC1 A1, F4
 J scale_object
 SLL A0, T0, 0x0

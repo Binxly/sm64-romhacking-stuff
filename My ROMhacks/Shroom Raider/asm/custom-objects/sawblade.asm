@@ -46,7 +46,6 @@ LW RA, 0x14 (SP)
 JR RA
 ADDIU SP, SP, 0x18
 
-
 @action_hidden:
 	LI T0, g_mario
 	LUI AT, 0xC51C

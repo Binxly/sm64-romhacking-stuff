@@ -1,8 +1,5 @@
 .definelabel ACT_WALLRUN,0x00000884
 
-should_bonk_off_unreferenced_wall:
-.word 0
-
 mario_air_actions_shim:
 LI T0, g_mario
 LW T0, m_action (T0)

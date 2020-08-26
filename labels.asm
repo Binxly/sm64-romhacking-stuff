@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm
-Falcobuster's Labels and Helper Functions v4.4.0
+Falcobuster's Labels and Helper Functions v4.5.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -45,7 +45,7 @@ m_angle equ 0x2C				; short[3]
 m_angle_vel equ 0x32			; short[3] -- angular velocity
 	m_angle_vel_pitch equ 0x32 	; short
 	m_angle_vel_yaw equ 0x34 	; short
-	m_angle_vel_roll equ 0x36 		; short
+	m_angle_vel_roll equ 0x36 	; short
 m_slide_angle_yaw equ 0x38		; short
 m_position equ 0x3C				; float[3]
 	m_x equ 0x3C				; float
@@ -173,7 +173,7 @@ o_substate equ 0x150			; unsigned int -- automatically reset to 0 when the actio
 o_timer equ 0x154				; int -- automatically increments every frame and resets to 0 when the state changes
 o_bounce equ 0x158				; float
 o_distance_to_mario equ 0x15C	; float -- automatically computed if OBJ_STORE_DISTANCE_TO_MARIO object flag is set
-o_angle_to_mario equ 0x160		; float -- automatically computed if OBJ_STORE_ANGLE_TO_MARIO object flag is set
+o_angle_to_mario equ 0x160		; int (sign extended short) -- automatically computed if OBJ_STORE_ANGLE_TO_MARIO object flag is set
 o_home equ 0x164				; float[3] -- automatically initialized if BHV_STORE_HOME is called in the behaviour script
 	o_home_x equ 0x164			; float
 	o_home_y equ 0x168			; float
@@ -406,9 +406,15 @@ function properly.
 */
 obj_update_floor_and_walls equ 0x802A2320
 
+/* obj_update_floor
+Upadates the object's references to floors
+*/
+obj_update_floor equ 0x802A20F4
+
 /* resolve_wall_collisions
-Updates the object's references to walls, and updates the move flags. You must
-set o_wall_hitbox_radius for wall collision resolution to function properly.
+Updates the object's references to walls, and returns a non-zero value if there
+is a wall collision. You must set o_wall_hitbox_radius for wall collision
+resolution to function properly.
 */
 obj_resolve_wall_collisions equ 0x802A1F3C
 

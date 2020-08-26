@@ -1,0 +1,7 @@
+beh_chain_impl:
+; BHV_START OBJ_LIST_DEFAULT
+BHV_OR_FLAGS o_flags, OBJ_FLAG_UPDATE_GFX | OBJ_ALWAYS_ACTIVE
+BHV_SET_FLOAT o_render_distance, 10000
+BHV_LOOP_BEGIN
+	BHV_EXEC horizontally_billboard
+BHV_LOOP_END

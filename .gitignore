@@ -3,9 +3,13 @@
 *.blend1
 *.srm
 *.state
+*.state1
 *.state.auto
 vtxc
 bg
 transdl
 alphadl
 private
+.directory
+modules
+/My ROMhacks/Fallen Kingdom/blend

@@ -1,0 +1,142 @@
+\documentclass[11pt]{article}
+
+\title{\textbf{Fallen Kingdom}}
+\author{by Falcobuster}
+\date{}
+
+\usepackage[margin=0.5in]{geometry}
+\usepackage{ocgx}
+\usepackage{textcomp}
+\usepackage{underscore}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+\maketitle
+
+Version 1.6
+
+\section{Emulator Setup}
+
+The recommended emulator for this hack (and Mario hacks in general) is ParallelN64, a core for RetroArch. For the best performance and accuracy, set the following settings (these settings should be good for all SM64 hacks, not just this one!):
+\begin{itemize}
+	\item \textbf{Quick Menu \textrightarrow Options}
+	\begin{itemize}
+		\item \textbf{CPU Core} set to \textbf{dynamic_recompiler} (this is the default value)
+		\item \textbf{GFX Accuracy} set to \textbf{veryhigh} (this is the default value)
+		\item \textbf{GFX Plugin} set to \textbf{glide64}
+		\item \textbf{RSP Plugin} set to \textbf{auto} (this the default value)
+		\item \textbf{VI Refresh (Overclock)} set to \textbf{2200}
+		\item \textbf{Framerate} set to \textbf{fullspeed} {\color{red} (Important)}
+		\item \textbf{Resolution} set to your preferred value. You should use an integer multiple of 320x240. I personally use \textbf{1280x960} (x4)
+		\item If you are using a Gamcube controller, set \textbf{Analog Sensitivity} to \textbf{150}. Otherwise, the default of \textbf{100} should be fine.
+	\end{itemize}
+	\item \textbf{Settings \textrightarrow Video}
+	\begin{itemize}
+		\item \textbf{Windowed Scale} set to \textbf{1.0x}
+		\item \textbf{Integer Scale} set to \textbf{ON}
+		\item \textbf{Vertical Sync (vsync)} set to \textbf{OFF} \textit{NOTE: on Linux you can still force vsync to be on using your window manager, and that's perfectly fine. Just make sure the vsync option in RetroArch itself is off since it is currently a little buggy and causes choppy audio- the actual vsync itself isn't a problem.)}
+	\end{itemize}
+\end{itemize}
+
+If you're the kind of person who still uses Internet Explorer (or you're a certain streamer who understandably doesn't want to setup a new emulator right now), then you can use Project64 instead. Project64 is slower, less accurate, somewhat buggy, limited to Windows, and only has a very old version of the recommended graphics plugin, so it's not recommended, but it will work.
+\bigbreak
+If using Project64, set the Count Factor to 1 and memory size to 8MB. You will want to use the Glide64 plugin. The Project64 version of Glide64 is over a decade old now and has issues that the up to date plugin for ParallelN64 doesn't have, but it's still good enough to run this hack without major issues. It will show up in your plugins list as \textit{Glide64 Final Date May 8 2012}. The similarly named, but completely different, GlideN64 plugin might also work, but its accuracy ranges from complete garbage to actually pretty good depending on the exact version, so using Glide64 is the safer choice.
+\bigbreak
+\pagebreak
+For your convenience, I have included a graphics plugin test on the first screen of the ROMhack. If your plugin is correct, it should look like this (but the static will be much lower quality on Project64):
+\bigbreak
+\includegraphics[width=\linewidth]{{"./blend/levels/Emulator Check/correct-display"}.png}
+\bigbreak
+I have also included a working graphics plugin in the \textit{For PJ64 Users} folder. The \textbf{glide3x.dll} file should be placed in your Project64 directory (probably C:\textbackslash{}Program Files (x86)\textbackslash{}Project64 1.6), and the other files (\textbf{Glide64.dll}, \textbf{Glide64.ini}, and \textbf{GlideHQ.dll}) should be placed in the \textbf{Plugins} directory in that folder. This plugin will show up in Project64 as \textit{Glide64 Final Date May 8 2012}.
+\bigbreak
+If the emulator check screen shows CPU Clock Emulation Check: {\color{red}FAIL}, this means you have not set \textbf{Framerate} to \textbf{fullspeed} (or in the case of Project 64, set \textbf{Counter Factor} to \textbf{1}). It is important to get this setting right, otherwise you will likely have performance issues. If you are using Project 64, you may need to completely close the ROM after changing the settings, then open it again.
+
+\section{Gameplay}
+
+This hack has some challenging platforming, but nothing too egregious. If you are trying to do something that involves a first or second frame wallkick or an absurdly precise angle, then what you are attempting to do is either impossible or an unintended sequence break. Some places may require you to get an item first before you can navigate them.
+
+There are 10 golden mushrooms hidden throughout the game, as well as 3 life shrooms. Each golden shroom increases your maximum health by half a heart, and each life shroom increases your maximum health by a full heart. If you collect all 10 golden shrooms and all 3 life shrooms, you will have 12 hearts by the end of the game. If you want to know in which levels the shrooms are located, see \textbf{hints.htm}.
+
+If you are having trouble with a certain part of the game, you can look at \textbf{hints.htm} for tips.
+
+\section{Music Credits}
+
+\fontsize{10}{12}\selectfont
+
+\textit{\Large Twilight Realm}\\
+\textbf{\small Source Game:} Twilight Princess\\
+\textbf{\small Use in ROM:} File Select Theme\\
+\textbf{\small Composer:} Asuka Ohta, Koji Kondo, and Toru Minegishi\\
+\textbf{\small M64 Sequencer:} ShrooboidBrat\\
+\break
+\textit{\Large Lost Emotion}\\
+\textbf{\small Source Game:} Touhou 14.5: Urban Legend in Limbo\\
+\textbf{\small Use in ROM:} Chasm of Lost Hope Theme\\
+\textbf{\small Composer:} Jun'ya ``ZUN'' Ōta\\
+\textbf{\small M64 Sequencer:} pieordie1\\
+\pagebreak \break
+\textit{\Large Faraway Voyage of 380,000 Kilometers}\\
+\textbf{\small Source Game:} Touhou 15: Legacy of Lunatic Kingdom\\
+\textbf{\small Use in ROM:} Star Road Theme\\
+\textbf{\small Composer:} Jun'ya ``ZUN'' Ōta\\
+\textbf{\small M64 Sequencer:} pieordie1\\
+\break
+\textit{\Large Dark Overworld}\\
+\textbf{\small Source Game:} A Link to the Past\\
+\textbf{\small Use in ROM:} Great Plains Theme\\
+\textbf{\small Composer:} Koji Kondo\\
+\textbf{\small M64 Sequencer:} cpuHacka101\\
+\break
+\textit{\Large Riding the Shell}\\
+\textbf{\small Source Game:} Rayman 2\\
+\textbf{\small Use in ROM:} Restless Rapids Theme\\
+\textbf{\small Composer:} 	Eric Chevalier\\
+\textbf{\small M64 Sequencer:} pieordie1\\
+\break
+\textit{\Large Waterfall}\\
+\textbf{\small Source Game:} Undertale\\
+\textbf{\small Use in ROM:} Flooded Temple Theme\\
+\textbf{\small Composer:} Toby Fox\\
+\textbf{\small M64 Sequencer:} MariosHub\\
+\break
+\textit{\Large Lower Norfair}\\
+\textbf{\small Source Game:} Super Metroid\\
+\textbf{\small Use in ROM:} Tal Tal Mines Theme\\
+\textbf{\small Composer:} Kenji Yamamoto and Minako Hamano\\
+\textbf{\small M64 Sequencer:} cpuHacka101\\
+\break
+\textit{\Large Boss Theme}\\
+\textbf{\small Source Game:} Majora's Mask\\
+\textbf{\small Use in ROM:} Blaarg Ambush Miniboss Theme\\
+\textbf{\small Composer:} Koji Kondo\\
+\textbf{\small M64 Sequencer:} EDark\\
+\break
+\textit{\Large Solar Sect of Mystic Wisdom $\sim$ Nuclear Fusion}\\
+\textbf{\small Source Game:} Touhou 11: Subterranean Animism\\
+\textbf{\small Use in ROM:} Moldorm Boss Theme\\
+\textbf{\small Composer:} Jun'ya ``ZUN'' Ōta\\
+\textbf{\small M64 Sequencer:} pieordie1\\
+\break
+\textit{\Large Reach for the Moon, Immortal Smoke}\\
+\textbf{\small Source Game:} Touhou 8: Imperishable Night\\
+\textbf{\small Use in ROM:} Bamboo Forest of the Lost Theme\\
+\textbf{\small Composer:} Jun'ya ``ZUN'' Ōta\\
+\textbf{\small M64 Sequencer:} pieordie1\\
+\break
+\textit{\Large Secret Course}\\
+\textbf{\small Source Game:} Super Mario Sunshine\\
+\textbf{\small Use in ROM:} Bamboo Forest of the Lost Secret World Theme\\
+\textbf{\small Composer:} 	Koji Kondo and Shinobu Tanaka\\
+\textbf{\small M64 Sequencer:} DobieMeltfire\\
+\break
+\textit{\Large Pure Furies $\sim$ Whereabouts of the Heart}\\
+\textbf{\small Source Game:} Touhou 15: Legacy of Lunatic Kingdom\\
+\textbf{\small Use in ROM:} Bowser's Theme\\
+\textbf{\small Composer:} Jun'ya ``ZUN'' Ōta\\
+\textbf{\small M64 Sequencer:} pieordie1\\
+
+
+
+\end{document}

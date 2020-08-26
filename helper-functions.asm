@@ -1,5 +1,5 @@
 /* labels.asm + helper-functions.asm + behaviour-script-macros.asm
-Falcobuster's Labels and Helper Functions v4.4.0
+Falcobuster's Labels and Helper Functions v4.5.0
 These two files are public domain. You may use, modify, and distribute them
 however you wish without restriction. Preserving this header comment is
 appreciated, but not required.
@@ -780,7 +780,7 @@ SUB.S F2, F4, F5
 JR RA
 S.S F2, 0x8 (A2)
 
-/* subtract_vectors_3d
+/* scale_vector_3d
 Multiplies a 3-dimensional vector by a scalar and stores the result in memory
 Does not alter the argument register values.
 args:
@@ -1002,6 +1002,39 @@ LW RA, 0x14 (SP)
 JR RA
 ADDIU SP, SP, 0x18
 
+/* pitch_and_yaw_to_unit_vector
+Constructs a unit vector in the direction defined by the given pitch and yaw
+args:
+	A0 - [short] pitch
+	A1 - [short] yaw
+returns:
+	F0 - unit vector x
+	F1 - unit vector y
+	F2 - unit vector z
+*/
+pitch_and_yaw_to_unit_vector:
+ADDIU SP, SP, 0xFFE0
+SW RA, 0x1C (SP)
+
+JAL angle_to_unit_vector
+SW A1, 0x10 (SP)
+
+NEG.S F0, F0
+S.S F0, 0x14 (SP)
+S.S F1, 0x18 (SP)
+
+JAL angle_to_unit_vector
+LW A0, 0x10 (SP)
+
+L.S F4, 0x18 (SP)
+MUL.S F0, F0, F4
+MUL.S F2, F1, F4
+L.S F1, 0x14 (SP)
+
+LW RA, 0x1C (SP)
+JR RA
+ADDIU SP, SP, 0x20
+
 /* obj_push_mario_out_of_hitbox
 Pushes Mario out of the object's hitbox. Can push Mario out of bounds!
 */
@@ -1128,6 +1161,19 @@ set_model:
 LI T0, 0x8032DDC4
 SLL AT, A1, 2
 ADDU T0, T0, AT
-LW T0, 0x0 (T0)
 JR RA
 SW T0, 0x14 (A0)
+
+/* get_count_factor
+Returns 0 if the ROM is being played on console.
+Returns 1 if the ROM is being played on emulator with good settings.
+Returns 2 or higher if the ROM is being played on emulator with bad settings.
+*/
+get_count_factor:
+MFC0 T0, COUNT
+NOP
+MFC0 T1, COUNT
+NOP
+SUBU AT, T1, T0
+JR RA
+SRL V0, AT, 1

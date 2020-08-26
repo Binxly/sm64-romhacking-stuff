@@ -1,0 +1,10 @@
+beh_stepping_stone_impl:
+; BHV_START OBJ_LIST_SURFACE
+BHV_OR_FLAGS o_flags, OBJ_FLAG_UPDATE_GFX | OBJ_STORE_DISTANCE_TO_MARIO
+BHV_SET_COLLISION bb_level_8_object_Stepping_Stone_collision
+BHV_SET_INT o_intangibility_timer, 0
+BHV_SET_FLOAT o_render_distance, 0x7FFF
+BHV_SET_FLOAT o_collision_distance, 2048
+BHV_LOOP_BEGIN
+	BHV_EXEC process_collision
+BHV_LOOP_END
