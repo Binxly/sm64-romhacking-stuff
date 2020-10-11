@@ -17,39 +17,77 @@
 
 Version 1.6
 
-\section{Emulator Setup}
+\section{Emulator Setup (ParallelN64)}
 
-The recommended emulator for this hack (and Mario hacks in general) is ParallelN64, a core for RetroArch. For the best performance and accuracy, set the following settings (these settings should be good for all SM64 hacks, not just this one!):
+The recommended emulator for this hack (and N64 ROMS in general) is ParallelN64, a core for RetroArch. ParallelN64 is faster, more accurate, less buggy, more configurable, and supports better graphics plugins than Project64; however, the RetroArch interface is notoriously confusing and annoying to use. For this reason, I am creating a launcher for ParallelN64 that allows to you bypass RetroArch's interface entirely. Unfortunately, if you just downloaded this hack and are reading this, it hasn't been released yet, so you will need to manually set up RetroArch using the instructions below.
+
+Alternatively, you \textit{can} use Project64 if you use a specific graphics plugin, but you will likely experience minor lag in some parts, and there may be some minor graphical bugs due to the Project64 version of the plugin being 8 years older than the ParallelN64 version.
+\bigbreak
+Download and install RetroArch, then go to \textbf{Main Menu \textrightarrow Load Core \textrightarrow Download a Core} and scroll down to find \textit{Nintendo - Nintendo 64 (ParaLLEl N64)} and install it.
+\bigbreak
+First, go to \textbf{Settings \textrightarrow Configuration} and make sure that \textbf{Save Configuration on Quit} is set to \textbf{ON}
+\bigbreak
+Next, go to \textbf{Settings \textrightarrow Video} and set the following settings:
 \begin{itemize}
-	\item \textbf{Quick Menu \textrightarrow Options}
+	\item \textbf{Suspend Screensaver} set to \textbf{ON}
+	\item \textbf{Windowed Mode}
 	\begin{itemize}
-		\item \textbf{CPU Core} set to \textbf{dynamic_recompiler} (this is the default value)
-		\item \textbf{GFX Accuracy} set to \textbf{veryhigh} (this is the default value)
-		\item \textbf{GFX Plugin} set to \textbf{glide64}
-		\item \textbf{RSP Plugin} set to \textbf{auto} (this the default value)
-		\item \textbf{VI Refresh (Overclock)} set to \textbf{2200}
-		\item \textbf{Framerate} set to \textbf{fullspeed} {\color{red} (Important)}
-		\item \textbf{Resolution} set to your preferred value. You should use an integer multiple of 320x240. I personally use \textbf{1280x960} (x4)
-		\item If you are using a Gamcube controller, set \textbf{Analog Sensitivity} to \textbf{150}. Otherwise, the default of \textbf{100} should be fine.
+		\item \textbf{Remember Window Position and Size} set to \textbf{ON}
+		\item \textbf{Window Width} and \textbf{Window Height} set to integer multiples of 320x240 (eg. 1280x960)
 	\end{itemize}
-	\item \textbf{Settings \textrightarrow Video}
+	\item \textbf{Scaling}
 	\begin{itemize}
-		\item \textbf{Windowed Scale} set to \textbf{1.0x}
 		\item \textbf{Integer Scale} set to \textbf{ON}
-		\item \textbf{Vertical Sync (vsync)} set to \textbf{OFF} \textit{NOTE: on Linux you can still force vsync to be on using your window manager, and that's perfectly fine. Just make sure the vsync option in RetroArch itself is off since it is currently a little buggy and causes choppy audio- the actual vsync itself isn't a problem.)}
+	\end{itemize}
+	\item \textbf{Synchronization}
+	\begin{itemize}
+		\item \textbf{Vertical Sync (Vsync)} set to \textbf{OFF}
 	\end{itemize}
 \end{itemize}
+\bigbreak
+Now to setup your controller, go to \textbf{Settings \textrightarrow Input \textrightarrow Port 1 Controls}. RetroArch uses a confusing setup where controllers are bound to a virtual controller, which is then bound again for each core. To make things simpler, you can just map the following inputs so they should automatically work with N64:
+\begin{itemize}
+	\item \textbf{B Button (Down)} is the N64 \textbf{A Button}
+	\item \textbf{Y Button (Left)} is the N64 \textbf{B Button}
+	\item \textbf{Start Button} is actually the \textbf{Start Button}
+	\item \textbf{D-Pad} maps as expected to the N64 \textbf{D-Pad}
+	\item \textbf{L Button (Shoulder)} is the N64 \textbf{L Trigger}
+	\item \textbf{R Button (Shoulder)} is the N64 \textbf{R Trigger}
+	\item \textbf{L2 Button (Trigger)} is the N64 \textbf{Z Trigger}
+	\item \textbf{Left Analog} maps to the N64 \textbf{Analog Stick} as expected
+	\item \textbf{Right Analog} maps to the N64 \textbf{C Buttons} as expected
+\end{itemize}
+\bigbreak
+Finally, launch an N64 ROM, then press \textbf{F1} after starting the ROM to bring up the \textbf{Quick Menu}. Now go to \textbf{Options} and set the following settings:
+\begin{itemize}
+	\item \textbf{CPU Core} set to \textbf{dynamic_recompiler}
+	\item \textbf{Enable Expansion Pak RAM} set to \textbf{ON}
+	\item \textbf{GFX Accuracy} set to \textbf{veryhigh}
+	\item \textbf{(ParaLLEl-RDP) Upscaling Factor} set to \textbf{4x} (or whatever integer scale you used earlier for your window size)
+	\item \textbf{(ParaLLEl-RDP) Use native texture LOD when upscaling} set to \textbf{ON}
+	\item \textbf{GFX Plugin} set to \textbf{glide64} (NOTE: for console compatible hacks- which this is not- \textbf{parallel} is the best choice instead)
+	\item \textbf{Resolution} set to the same as you set for the window size
+	\item \textbf{VI Refresh (Overclock)} set to \textbf{2200}
+	\item \textbf{Framerate} set to \textbf{fullspeed}
+\end{itemize}
+\bigbreak
+Now, close the emulator and restart RetroArch. Your settings are now good for all N64 roms.
+	
+\section{Emulator Setup (Project64)}
+Project64 is semi-obsolete and not recommended, but it is still usable for this hack. If you are using Project64, then you must use graphics plugin included in the \textbf{For PJ64 Users} folder. Go to your Project64 directory (which is probably C:\textbackslash{}Program Files (x86)\textbackslash{}Project64 2.4) and place the \textbf{glide3x.dll} file there. Then, copy the three files in the included \textbf{Plugins} subdirectory into the \textbf{Plugins} directory in your Project 64 folder. If you did everything correctly, the plugin should appear in your list of graphics plugins in Project64 as \textit{Glide64 Final Date May 8 2012}.
+	Now, open up Project 64 and go to \textbf{Options \textrightarrow Settings} and uncheck the box that says \textbf{Hide advanced settings}. Now set the following settings under \textbf{Defaults}:
+\begin{itemize}
+	\item \textbf{Memory size} set to \textbf{8 MB}
+	\item \textbf{Counter factor} set to \textbf{1}
+	\item \textbf{VI refresh rate} set to \textbf{2200}
+	\item \textbf{Unaligned DMA} checked
+\end{itemize}
+Next, go to \textbf{Plugins} and select \textbf{Glide64 Final Date May 8 2012} from the \textbf{Video (graphics) plugin} combo box.
 
-If you're the kind of person who still uses Internet Explorer (or you're a certain streamer who understandably doesn't want to setup a new emulator right now), then you can use Project64 instead. Project64 is slower, less accurate, somewhat buggy, limited to Windows, and only has a very old version of the recommended graphics plugin, so it's not recommended, but it will work.
-\bigbreak
-If using Project64, set the Count Factor to 1 and memory size to 8MB. You will want to use the Glide64 plugin. The Project64 version of Glide64 is over a decade old now and has issues that the up to date plugin for ParallelN64 doesn't have, but it's still good enough to run this hack without major issues. It will show up in your plugins list as \textit{Glide64 Final Date May 8 2012}. The similarly named, but completely different, GlideN64 plugin might also work, but its accuracy ranges from complete garbage to actually pretty good depending on the exact version, so using Glide64 is the safer choice.
-\bigbreak
-\pagebreak
+\section{Graphics Plugin Test}
 For your convenience, I have included a graphics plugin test on the first screen of the ROMhack. If your plugin is correct, it should look like this (but the static will be much lower quality on Project64):
 \bigbreak
 \includegraphics[width=\linewidth]{{"./blend/levels/Emulator Check/correct-display"}.png}
-\bigbreak
-I have also included a working graphics plugin in the \textit{For PJ64 Users} folder. The \textbf{glide3x.dll} file should be placed in your Project64 directory (probably C:\textbackslash{}Program Files (x86)\textbackslash{}Project64 1.6), and the other files (\textbf{Glide64.dll}, \textbf{Glide64.ini}, and \textbf{GlideHQ.dll}) should be placed in the \textbf{Plugins} directory in that folder. This plugin will show up in Project64 as \textit{Glide64 Final Date May 8 2012}.
 \bigbreak
 If the emulator check screen shows CPU Clock Emulation Check: {\color{red}FAIL}, this means you have not set \textbf{Framerate} to \textbf{fullspeed} (or in the case of Project 64, set \textbf{Counter Factor} to \textbf{1}). It is important to get this setting right, otherwise you will likely have performance issues. If you are using Project 64, you may need to completely close the ROM after changing the settings, then open it again.
 
@@ -76,7 +114,7 @@ If you are having trouble with a certain part of the game, you can look at \text
 \textbf{\small Use in ROM:} Chasm of Lost Hope Theme\\
 \textbf{\small Composer:} Jun'ya ``ZUN'' Ōta\\
 \textbf{\small M64 Sequencer:} pieordie1\\
-\pagebreak \break
+\break
 \textit{\Large Faraway Voyage of 380,000 Kilometers}\\
 \textbf{\small Source Game:} Touhou 15: Legacy of Lunatic Kingdom\\
 \textbf{\small Use in ROM:} Star Road Theme\\
